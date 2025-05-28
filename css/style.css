@@ -1,0 +1,71 @@
+/* Payment page specific styles */
+
+.badge {
+    padding: 0.5em 0.75em;
+    font-weight: 500;
+}
+
+.badge.bg-success {
+    background-color: rgba(25, 135, 84, 0.9) !important;
+}
+
+.badge.bg-warning {
+    background-color: rgba(255, 193, 7, 0.9) !important;
+    color: #212529;
+}
+
+.badge.bg-danger {
+    background-color: rgba(220, 53, 69, 0.9) !important;
+}
+
+.badge.bg-info {
+    background-color: rgba(13, 202, 240, 0.9) !important;
+    color: #212529;
+}
+
+/* Summary cards hover effect */
+.card.bg-success,
+.card.bg-warning,
+.card.bg-info {
+    transition: all 0.3s ease;
+}
+
+.card.bg-success:hover,
+.card.bg-warning:hover,
+.card.bg-info:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Receipt button style */
+.receipt-btn {
+    color: #17a2b8;
+    border-color: #17a2b8;
+}
+
+.receipt-btn:hover {
+    color: #fff;
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+}
+
+/* Logout button styling */
+.dropdown-item.logout-btn {
+    color: #dc3545;
+}
+
+.dropdown-item.logout-btn:hover {
+    background-color: #dc3545;
+    color: white;
+}
+
+/* For standalone logout button */
+.menu-item.logout-btn {
+    margin-top: auto; /* Push to bottom of sidebar */
+    color: #dc3545;
+}
+
+.menu-item.logout-btn:hover {
+    background-color: #dc3545;
+    color: white;
+}
