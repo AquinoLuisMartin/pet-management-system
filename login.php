@@ -1,4 +1,3 @@
-
 <?php
 session_start();
 include "includes/db_conn.php";
@@ -14,9 +13,11 @@ if(isset($_POST['login'])) {
     $email = mysqli_real_escape_string($conn, $_POST['email']);
     $password = $_POST['password'];
     
-    // Check if user exists
-    $sql = "SELECT * FROM owner WHERE Email = '$email'";
-    $result = mysqli_query($conn, $sql);
+    // Check if user exists - use stored procedure
+    $stmt = $conn->prepare("CALL GetOwnerByEmail(?)");
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
     
     if(mysqli_num_rows($result) > 0) {
         $row = mysqli_fetch_assoc($result);

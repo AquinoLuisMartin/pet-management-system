@@ -55,13 +55,12 @@ if (isset($_GET["msg"])) {
                                 <a href="view_pet.php?id=<?php echo $row["PetID"]; ?>" class="btn btn-sm btn-info">
                                     <i class="fas fa-eye"></i>
                                 </a>
-                                <a href="edit_pet.php?id=<?php echo $row["PetID"]; ?>" class="btn btn-sm btn-warning">
+                                <a href="edit.php?id=<?php echo $row['PetID']; ?>" class="btn btn-sm btn-outline-primary">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <a href="delete_pet.php?id=<?php echo $row["PetID"]; ?>" class="btn btn-sm btn-danger" 
-                                   onclick="return confirm('Are you sure you want to delete this pet?')">
+                                <button class="btn btn-sm btn-outline-danger delete-btn" data-id="<?php echo $row['PetID']; ?>">
                                     <i class="fas fa-trash"></i>
-                                </a>
+                                </button>
                             </td>
                         </tr>
                         <?php

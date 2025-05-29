@@ -11,10 +11,10 @@ if (isset($_POST["submit"])) {
     $conditions = $_POST['conditions'];
     $ownerID = $_POST['ownerID'];
 
-    $sql = "INSERT INTO `pet`(`Name`, `Species`, `Breed`, `DateOfBirth`, `Gender`, `Weight`, `MedicalConditions`, `OwnerID`) 
-            VALUES ('$name','$species','$breed','$dob','$gender','$weight','$conditions','$ownerID')";
-
-    $result = mysqli_query($conn, $sql);
+    // Use stored procedure instead of direct SQL
+    $stmt = $conn->prepare("CALL AddNewPet(?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("sssssdsi", $name, $species, $breed, $dob, $gender, $weight, $conditions, $ownerID);
+    $result = $stmt->execute();
 
     if ($result) {
         header("Location: pets.php?msg=New pet added successfully");

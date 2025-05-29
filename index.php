@@ -1,12 +1,17 @@
 <?php
 include "includes/db_conn.php";
 
-// Count data for dashboard stats
-$pet_count = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as count FROM pet"))['count'];
-$owner_count = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as count FROM owner"))['count'];
-$vet_count = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as count FROM veterinarian"))['count'];
+// Count data for dashboard stats using stored procedure
+$stmt = $conn->prepare("CALL GetDashboardStats()");
+$stmt->execute();
+$result = $stmt->get_result();
+$stats = mysqli_fetch_assoc($result);
+
+$pet_count = $stats['pet_count'];
+$owner_count = $stats['owner_count'];
+$vet_count = $stats['vet_count'];
 $today = date('Y-m-d');
-$appointment_count = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as count FROM appointment WHERE Date >= '$today'"))['count'];
+$appointment_count = $stats['appointment_count'];
 
 // Include header
 include "includes/header.php";
@@ -117,63 +122,7 @@ if(isset($_SESSION['owner_id'])) {
     </div>
 </div>
 
-<!-- Recent Activity Section -->
-<div class="section-header">
-    <h2>Recent Activities</h2>
-</div>
 
-<table class="table table-hover bg-white rounded shadow-sm">
-    <thead class="bg-light">
-        <tr>
-            <th>ID</th>
-            <th>Pet Name</th>
-            <th>Owner</th>
-            <th>Date</th>
-            <th>Service</th>
-            <th>Status</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php
-        $sql = "SELECT a.Date, a.Status, a.Reason, 
-                p.Name as PetName, p.PetID,
-                CONCAT(o.FirstName, ' ', o.LastName) as OwnerName
-                FROM appointment a
-                JOIN pet p ON a.PetID = p.PetID
-                JOIN owner o ON p.OwnerID = o.OwnerID
-                ORDER BY a.Date DESC LIMIT 5";
-        
-        $result = mysqli_query($conn, $sql);
-        
-        if (mysqli_num_rows($result) > 0) {
-            while ($row = mysqli_fetch_assoc($result)) {
-                $status_class = '';
-                switch ($row['Status']) {
-                    case 'Completed':
-                        $status_class = 'text-success';
-                        break;
-                    case 'Scheduled':
-                        $status_class = 'text-primary';
-                        break;
-                    case 'Cancelled':
-                        $status_class = 'text-danger';
-                        break;
-                }
-                
-                echo "<tr>
-                    <td>" . $row['PetID'] . "</td>
-                    <td>" . $row['PetName'] . "</td>
-                    <td>" . $row['OwnerName'] . "</td>
-                    <td>" . $row['Date'] . "</td>
-                    <td>" . $row['Reason'] . "</td>
-                    <td class='" . $status_class . "'>" . $row['Status'] . "</td>
-                </tr>";
-            }
-        } else {
-            echo "<tr><td colspan='6' class='text-center'>No recent appointments found</td></tr>";
-        }
-        ?>
-    </tbody>
-</table>
+
 
 <?php include "includes/footer.php"; ?>

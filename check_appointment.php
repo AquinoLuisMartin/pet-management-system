@@ -11,42 +11,20 @@ if (isset($_POST['search'])) {
     $search_type = $_POST['search_type'];
     $search_value = mysqli_real_escape_string($conn, $_POST['search_value']);
     
-    // Build query based on search type
+    // Use stored procedures based on search type
     if ($search_type == 'appointment_id') {
-        $sql = "SELECT a.AppointmentID, a.Date, a.Time, a.Status, a.Reason, 
-                p.Name as PetName, p.Species, p.Breed,
-                CONCAT(o.FirstName, ' ', o.LastName) as OwnerName, o.Email, o.Phone,
-                CONCAT(v.FirstName, ' ', v.LastName) as VetName
-                FROM appointment a
-                JOIN pet p ON a.PetID = p.PetID
-                JOIN owner o ON p.OwnerID = o.OwnerID
-                JOIN veterinarian v ON a.VetID = v.VetID
-                WHERE a.AppointmentID = '$search_value'";
+        $stmt = $conn->prepare("CALL GetAppointmentById(?)");
+        $stmt->bind_param("s", $search_value);
     } else if ($search_type == 'pet_name') {
-        $sql = "SELECT a.AppointmentID, a.Date, a.Time, a.Status, a.Reason, 
-                p.Name as PetName, p.Species, p.Breed,
-                CONCAT(o.FirstName, ' ', o.LastName) as OwnerName, o.Email, o.Phone,
-                CONCAT(v.FirstName, ' ', v.LastName) as VetName
-                FROM appointment a
-                JOIN pet p ON a.PetID = p.PetID
-                JOIN owner o ON p.OwnerID = o.OwnerID
-                JOIN veterinarian v ON a.VetID = v.VetID
-                WHERE p.Name LIKE '%$search_value%'
-                ORDER BY a.Date DESC";
+        $stmt = $conn->prepare("CALL GetAppointmentsByPetName(?)");
+        $stmt->bind_param("s", $search_value);
     } else if ($search_type == 'owner_name') {
-        $sql = "SELECT a.AppointmentID, a.Date, a.Time, a.Status, a.Reason, 
-                p.Name as PetName, p.Species, p.Breed,
-                CONCAT(o.FirstName, ' ', o.LastName) as OwnerName, o.Email, o.Phone,
-                CONCAT(v.FirstName, ' ', v.LastName) as VetName
-                FROM appointment a
-                JOIN pet p ON a.PetID = p.PetID
-                JOIN owner o ON p.OwnerID = o.OwnerID
-                JOIN veterinarian v ON a.VetID = v.VetID
-                WHERE CONCAT(o.FirstName, ' ', o.LastName) LIKE '%$search_value%'
-                ORDER BY a.Date DESC";
+        $stmt = $conn->prepare("CALL GetAppointmentsByOwnerName(?)");
+        $stmt->bind_param("s", $search_value);
     }
     
-    $result = mysqli_query($conn, $sql);
+    $stmt->execute();
+    $result = $stmt->get_result();
 }
 ?>
 
