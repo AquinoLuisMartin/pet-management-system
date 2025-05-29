@@ -1,32 +1,47 @@
 <?php
-<?php
 include "includes/db_conn.php";
 
 // Check if form was submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Get data from form
-    $petID = $_POST['petID'];
+    $petName = mysqli_real_escape_string($conn, $_POST['petName']);
+    $ownerName = mysqli_real_escape_string($conn, $_POST['ownerName']);
     $vetID = $_POST['vetID'];
     $date = $_POST['date'];
     $time = $_POST['time'];
     $reason = mysqli_real_escape_string($conn, $_POST['reason']);
     $status = $_POST['status'];
-
-    // Check if appointment already exists
-    $check_sql = "SELECT * FROM appointment 
-                  WHERE PetID = $petID 
-                  AND VetID = $vetID 
-                  AND Date = '$date' 
-                  AND Time = '$time'";
-    $check_result = mysqli_query($conn, $check_sql);
-
-    if (mysqli_num_rows($check_result) > 0) {
-        // Appointment already exists
-        header("Location: appointment.php?error=Appointment already exists for this pet, veterinarian, date and time");
-        exit();
+    
+    // First check if we can find this pet by name and owner
+    $owner_parts = explode(' ', $ownerName);
+    $lastName = end($owner_parts);
+    $firstName = reset($owner_parts);
+    
+    $find_pet_sql = "SELECT p.PetID 
+                    FROM pet p 
+                    JOIN owner o ON p.OwnerID = o.OwnerID 
+                    WHERE p.Name = '$petName' 
+                    AND (o.FirstName LIKE '%$firstName%' AND o.LastName LIKE '%$lastName%')";
+    
+    $pet_result = mysqli_query($conn, $find_pet_sql);
+    
+    if (mysqli_num_rows($pet_result) > 0) {
+        // Found the pet, use its ID
+        $petID = mysqli_fetch_assoc($pet_result)['PetID'];
+    } else {
+        // Pet not found, create new pet and owner records
+        // First create the owner
+        $create_owner = "INSERT INTO owner (FirstName, LastName) VALUES ('$firstName', '$lastName')";
+        mysqli_query($conn, $create_owner);
+        $ownerID = mysqli_insert_id($conn);
+        
+        // Then create the pet
+        $create_pet = "INSERT INTO pet (Name, OwnerID) VALUES ('$petName', $ownerID)";
+        mysqli_query($conn, $create_pet);
+        $petID = mysqli_insert_id($conn);
     }
-
-    // Insert new appointment
+    
+    // Now create the appointment using the pet ID
     $sql = "INSERT INTO appointment (PetID, VetID, Date, Time, Reason, Status)
             VALUES ($petID, $vetID, '$date', '$time', '$reason', '$status')";
 

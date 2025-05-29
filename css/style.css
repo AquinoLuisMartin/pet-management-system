@@ -69,3 +69,25 @@
     background-color: #dc3545;
     color: white;
 }
+
+/* Add to your CSS file */
+.hero-section .btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: white;
+    padding: 8px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    display: inline-block;
+    transition: background-color 0.3s;
+    font-weight: 500;
+}
+
+.hero-section .btn-danger:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
+}
+
+.hero-section .btn-danger i {
+    margin-right: 5px;
+}

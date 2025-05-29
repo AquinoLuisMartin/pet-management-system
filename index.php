@@ -35,10 +35,11 @@ if(isset($_SESSION['owner_id'])) {
     <h1>Pet Services and Veterinary<br>Clinic</h1>
     <?php if(isset($_SESSION['owner_id'])): ?>
     <p>Welcome back, <?php echo $_SESSION['owner_name']; ?>!</p>
+    
+    
     <?php endif; ?>
     <div class="hero-buttons">
         <a href="pets.php" class="btn-white">Get Started</a>
-        <a href="services.php" class="btn-outline-white">Learn More</a>
     </div>
 </div>
 
@@ -66,14 +67,6 @@ if(isset($_SESSION['owner_id'])) {
         </div>
         <h3>Doctor</h3>
         <p class="text-muted">Veterinarian profiles</p>
-    </div>
-    
-    <div class="feature-card">
-        <div class="feature-icon">
-            <i class="fas fa-stethoscope"></i>
-        </div>
-        <h3>Services</h3>
-        <p class="text-muted">Medical treatments</p>
     </div>
     
     <div class="feature-card">

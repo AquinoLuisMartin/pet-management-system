@@ -41,10 +41,6 @@
                 <i class="far fa-calendar"></i>
                 <span class="menu-text">Appointment</span>
             </a>
-            <a href="services.php" class="menu-item <?php echo basename($_SERVER['PHP_SELF']) == 'services.php' ? 'active' : ''; ?>">
-                <i class="fas fa-list"></i>
-                <span class="menu-text">Services</span>
-            </a>
             <a href="check_appointment.php" class="menu-item <?php echo basename($_SERVER['PHP_SELF']) == 'check_appointment.php' ? 'active' : ''; ?>">
                 <i class="fas fa-clipboard-check"></i>
                 <span class="menu-text">Check Appointment</span>
@@ -68,6 +64,11 @@
             <a href="settings.php" class="menu-item <?php echo basename($_SERVER['PHP_SELF']) == 'settings.php' ? 'active' : ''; ?>">
                 <i class="fas fa-cog"></i>
                 <span class="menu-text">Settings</span>
+            </a>
+
+            <a href="logout.php" class="menu-item <?php echo basename($_SERVER['PHP_SELF']) == 'logout.php' ? 'active' : ''; ?>">
+                <i class="fas fa-sign-out-alt"></i>
+                <span class="menu-text">Logout</span>
             </a>
         </div>
         <div class="sidebar-menu">

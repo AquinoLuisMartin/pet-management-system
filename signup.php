@@ -132,7 +132,7 @@ if(isset($_POST['signup'])) {
                     <div class="col-md-6">
                         <label for="password" class="form-label">Password</label>
                         <input type="password" class="form-control" id="password" name="password" required>
-                        <div class="form-text">Password must be at least 8 characters long</div>
+                        
                     </div>
                     <div class="col-md-6">
                         <label for="confirmPassword" class="form-label">Confirm Password</label>

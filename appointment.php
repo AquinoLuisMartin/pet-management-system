@@ -148,32 +148,18 @@ $result = mysqli_query($conn, $sql);
             </div>
             <div class="modal-body">
                 <form id="appointmentForm" action="appointment_process.php" method="post">
-                    <!-- Form fields here -->
+                    <!-- Pet information as text inputs -->
                     <div class="form-group">
-                        <label for="petID">Pet</label>
-                        <select class="form-control" id="petID" name="petID" required>
-                            <option value="">Select Pet</option>
-                            <?php
-                            $pets = mysqli_query($conn, "SELECT p.PetID, p.Name, CONCAT(o.FirstName, ' ', o.LastName) as Owner FROM pet p JOIN owner o ON p.OwnerID = o.OwnerID ORDER BY p.Name");
-                            while ($pet = mysqli_fetch_assoc($pets)) {
-                                echo "<option value='" . $pet['PetID'] . "'>" . $pet['Name'] . " (" . $pet['Owner'] . ")</option>";
-                            }
-                            ?>
-                        </select>
+                        <label for="petName">Pet Name</label>
+                        <input type="text" class="form-control" id="petName" name="petName" placeholder="Enter pet name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ownerName">Owner Name</label>
+                        <input type="text" class="form-control" id="ownerName" name="ownerName" placeholder="Enter owner name" required>
                     </div>
                     
-                    <div class="form-group">
-                        <label for="vetID">Veterinarian</label>
-                        <select class="form-control" id="vetID" name="vetID" required>
-                            <option value="">Select Veterinarian</option>
-                            <?php
-                            $vets = mysqli_query($conn, "SELECT VetID, CONCAT(FirstName, ' ', LastName) as Name FROM veterinarian ORDER BY Name");
-                            while ($vet = mysqli_fetch_assoc($vets)) {
-                                echo "<option value='" . $vet['VetID'] . "'>" . $vet['Name'] . "</option>";
-                            }
-                            ?>
-                        </select>
-                    </div>
+                    
                     
                     <div class="form-group">
                         <label for="date">Date</label>
