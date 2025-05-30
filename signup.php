@@ -23,23 +23,30 @@ if(isset($_POST['signup'])) {
         $error = "Passwords do not match. Please try again.";
     } else {
         // Check if email already exists
-        $check_email = mysqli_query($conn, "SELECT * FROM owner WHERE Email = '$email'");
+        $stmt = $conn->prepare("CALL CheckEmailExists(?)");
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $check_email = $stmt->get_result();
         
         if(mysqli_num_rows($check_email) > 0) {
             $error = "Email already exists. Please use a different email or login.";
         } else {
+            // Close the first statement
+            $stmt->close();
+            
             // Hash password
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
             
-            // Insert new user
-            $sql = "INSERT INTO owner (FirstName, LastName, Phone, Email, Address, Password) 
-                   VALUES ('$firstName', '$lastName', '$phone', '$email', '$address', '$hashed_password')";
-            
-            if(mysqli_query($conn, $sql)) {
-                // Get the new user ID
-                $owner_id = mysqli_insert_id($conn);
-                
+            // Use stored procedure to register new owner
+            $stmt = $conn->prepare("CALL RegisterOwner(?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("ssssss", $firstName, $lastName, $phone, $email, $address, $hashed_password);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $owner_data = mysqli_fetch_assoc($result);
+
+            if ($owner_data) {
                 // Set session variables
+                $owner_id = $owner_data['OwnerID'];
                 $_SESSION['owner_id'] = $owner_id;
                 $_SESSION['owner_name'] = $firstName . ' ' . $lastName;
                 $_SESSION['owner_email'] = $email;

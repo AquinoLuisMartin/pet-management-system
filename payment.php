@@ -2,37 +2,36 @@
 include "includes/db_conn.php";
 include "includes/header.php";
 
-// Get payment data from database using the correct column names
-$sql = "SELECT bp.InvoiceID as PaymentID, bp.PaymentMethod,
-        bp.TotalAmount as Amount, bp.Date as PaymentDate, bp.Status,
-        a.PetID, a.VetID, a.Date as AppointmentDate, a.Time,
-        p.Name as PetName,
-        CONCAT(o.FirstName, ' ', o.LastName) as OwnerName
-        FROM billingpayment bp
-        JOIN pet p ON bp.PetID = p.PetID
-        JOIN owner o ON bp.OwnerID = o.OwnerID
-        LEFT JOIN appointment a ON p.PetID = a.PetID
-        ORDER BY bp.Date DESC";
+// Get payment data using stored procedure
+$stmt = $conn->prepare("CALL GetAllPayments()");
+$stmt->execute();
+$result = $stmt->get_result();
+$stmt->close();
 
-$result = mysqli_query($conn, $sql);
-
-// Fix column names in revenue queries
-$revenue_sql = "SELECT SUM(TotalAmount) as TotalRevenue FROM billingpayment WHERE Status = 'Paid'";
-$revenue_result = mysqli_query($conn, $revenue_sql);
+// Get total revenue using stored procedure
+$stmt = $conn->prepare("CALL GetTotalRevenue()");
+$stmt->execute();
+$revenue_result = $stmt->get_result();
 $total_revenue = mysqli_fetch_assoc($revenue_result)['TotalRevenue'] ?? 0;
+$stmt->close();
 
-// Fix column names in pending payments query
-$pending_sql = "SELECT SUM(TotalAmount) as PendingRevenue FROM billingpayment WHERE Status = 'Pending'";
-$pending_result = mysqli_query($conn, $pending_sql);
+// Get pending revenue using stored procedure
+$stmt = $conn->prepare("CALL GetPendingRevenue()");
+$stmt->execute();
+$pending_result = $stmt->get_result();
 $pending_revenue = mysqli_fetch_assoc($pending_result)['PendingRevenue'] ?? 0;
+$stmt->close();
 
-// Fix column names in today's payments query
+// Get today's payments using stored procedure
 $today = date('Y-m-d');
-$today_sql = "SELECT COUNT(*) as count, SUM(TotalAmount) as total FROM billingpayment WHERE Date = '$today'";
-$today_result = mysqli_query($conn, $today_sql);
+$stmt = $conn->prepare("CALL GetTodayPayments(?)");
+$stmt->bind_param("s", $today);
+$stmt->execute();
+$today_result = $stmt->get_result();
 $today_data = mysqli_fetch_assoc($today_result);
 $today_count = $today_data['count'] ?? 0;
 $today_total = $today_data['total'] ?? 0;
+$stmt->close();
 ?>
 
 <div class="container mt-4">

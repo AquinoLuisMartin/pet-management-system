@@ -2,13 +2,10 @@
 include "includes/db_conn.php";
 include "includes/header.php";
 
-// Get owners with pet counts
-$sql = "SELECT o.*, COUNT(p.PetID) as PetCount 
-        FROM owner o 
-        LEFT JOIN pet p ON o.OwnerID = p.OwnerID 
-        GROUP BY o.OwnerID
-        ORDER BY o.LastName, o.FirstName";
-$result = mysqli_query($conn, $sql);
+// Get owners with pet counts using stored procedure
+$stmt = $conn->prepare("CALL GetAllOwnersWithPetCount()");
+$stmt->execute();
+$result = $stmt->get_result();
 ?>
 
 <div class="container mt-4">

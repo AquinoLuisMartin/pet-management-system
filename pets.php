@@ -35,11 +35,10 @@ if (isset($_GET["msg"])) {
             </thead>
             <tbody>
                 <?php
-                $sql = "SELECT p.*, CONCAT(o.FirstName, ' ', o.LastName) as OwnerName 
-                        FROM pet p 
-                        LEFT JOIN owner o ON p.OwnerID = o.OwnerID
-                        ORDER BY p.PetID DESC";
-                $result = mysqli_query($conn, $sql);
+                // Use stored procedure instead of direct SQL query
+                $stmt = $conn->prepare("CALL GetAllPets()");
+                $stmt->execute();
+                $result = $stmt->get_result();
                 
                 if (mysqli_num_rows($result) > 0) {
                     while ($row = mysqli_fetch_assoc($result)) {
@@ -68,10 +67,47 @@ if (isset($_GET["msg"])) {
                 } else {
                     echo "<tr><td colspan='7' class='text-center'>No pets found</td></tr>";
                 }
+                $stmt->close();
                 ?>
             </tbody>
         </table>
     </div>
 </div>
+
+<!-- Delete confirmation modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to delete this pet? This action cannot be undone.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <a href="#" id="confirmDelete" class="btn btn-danger">Delete</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Add event listeners to delete buttons
+document.addEventListener('DOMContentLoaded', function() {
+    const deleteButtons = document.querySelectorAll('.delete-btn');
+    const confirmDeleteBtn = document.getElementById('confirmDelete');
+    const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const petId = this.getAttribute('data-id');
+            confirmDeleteBtn.href = `delete_pet.php?id=${petId}`;
+            deleteModal.show();
+        });
+    });
+});
+</script>
 
 <?php include "includes/footer.php"; ?>

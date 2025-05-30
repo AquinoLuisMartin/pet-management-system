@@ -2,14 +2,8 @@
 include "includes/db_conn.php";
 include "includes/header.php";
 
-// Get all veterinarians - FIXED QUERY
-$sql = "SELECT v.*, 
-        COUNT(DISTINCT CONCAT(a.PetID, a.Date, a.Time)) as AppointmentCount,
-        COUNT(DISTINCT CASE WHEN a.PetID IS NOT NULL THEN a.PetID END) as PetCount
-        FROM veterinarian v
-        LEFT JOIN appointment a ON v.VetID = a.VetID
-        GROUP BY v.VetID, v.FirstName, v.LastName, v.Email, v.Specialization
-        ORDER BY v.LastName, v.FirstName";
+// Get all veterinarians - Using Stored Procedure
+$sql = "CALL GetAllVeterinariansWithStats()";
 
 $result = mysqli_query($conn, $sql) or die("Query failed: " . mysqli_error($conn));
 ?>
@@ -186,3 +180,4 @@ $(document).ready(function() {
 </script>
 
 <?php include "includes/footer.php"; ?>
+
