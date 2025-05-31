@@ -1,17 +1,34 @@
 <?php
+session_start(); // Add this line to ensure sessions work
 include "includes/db_conn.php";
 
 // Count data for dashboard stats using stored procedure
-$stmt = $conn->prepare("CALL GetDashboardStats()");
-$stmt->execute();
-$result = $stmt->get_result();
-$stats = mysqli_fetch_assoc($result);
-
-$pet_count = $stats['pet_count'];
-$owner_count = $stats['owner_count'];
-$vet_count = $stats['vet_count'];
-$today = date('Y-m-d');
-$appointment_count = $stats['appointment_count'];
+try {
+    $stmt = $conn->prepare("CALL GetDashboardStats()");
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($result && $stats = mysqli_fetch_assoc($result)) {
+        $pet_count = $stats['pet_count'];
+        $owner_count = $stats['owner_count'];
+        $vet_count = $stats['vet_count'];
+        $appointment_count = $stats['appointment_count'];
+    } else {
+        // Default values if procedure fails
+        $pet_count = 0;
+        $owner_count = 0;
+        $vet_count = 0;
+        $appointment_count = 0;
+    }
+} catch (Exception $e) {
+    // Default values if procedure fails
+    $pet_count = 0;
+    $owner_count = 0;
+    $vet_count = 0;
+    $appointment_count = 0;
+    // Optionally log the error
+    error_log("Dashboard stats error: " . $e->getMessage());
+}
 
 // Include header
 include "includes/header.php";
@@ -20,9 +37,26 @@ include "includes/header.php";
 $owner_pets = array();
 if(isset($_SESSION['owner_id'])) {
     $owner_id = $_SESSION['owner_id'];
-    $pets_query = mysqli_query($conn, "SELECT * FROM pet WHERE OwnerID = $owner_id");
-    while($pet = mysqli_fetch_assoc($pets_query)) {
-        $owner_pets[] = $pet;
+    // Close any previous result set
+    if (isset($result) && $result) {
+        $result->close();
+    }
+    
+    // Use prepared statement with stored procedure
+    try {
+        $stmt = $conn->prepare("CALL GetOwnerPets(?)");
+        $stmt->bind_param("i", $owner_id);
+        $stmt->execute();
+        $pets_result = $stmt->get_result();
+        
+        if ($pets_result) {
+            while($pet = mysqli_fetch_assoc($pets_result)) {
+                $owner_pets[] = $pet;
+            }
+        }
+        $stmt->close();
+    } catch (Exception $e) {
+        error_log("Error fetching owner pets: " . $e->getMessage());
     }
 }
 ?>
@@ -74,6 +108,14 @@ if(isset($_SESSION['owner_id'])) {
         <p class="text-muted">Veterinarian profiles</p>
     </div>
     
+    <div class="feature-card">
+        <div class="feature-icon">
+            <i class="fas fa-pills"></i>
+        </div>
+        <h3>Pharmacy</h3>
+        <p class="text-muted">Medication inventory</p>
+    </div>
+
     <div class="feature-card">
         <div class="feature-icon">
             <i class="fas fa-pills"></i>

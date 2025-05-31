@@ -2,25 +2,56 @@
 include "includes/db_conn.php";
 include "includes/header.php";
 
-// Check if user is logged in (if you have authentication)
-// if (!isset($_SESSION['user_id'])) {
-//     header("Location: login.php");
-//     exit();
-// }
+// Get appointment data using stored procedure
+$stmt = $conn->prepare("CALL GetAllAppointments()");
+$stmt->execute();
+$result = $stmt->get_result();
+$stmt->close();
 
-// Get appointment data from database
-$sql = "SELECT CONCAT(a.PetID, '-', a.VetID, '-', a.Date, '-', a.Time) AS AppointmentID, 
-        a.PetID, a.VetID, a.Date, a.Time, a.Status, a.Reason, 
-        p.Name as PetName, 
-        CONCAT(o.FirstName, ' ', o.LastName) as OwnerName,
-        CONCAT(v.FirstName, ' ', v.LastName) as VetName
-        FROM appointment a
-        JOIN pet p ON a.PetID = p.PetID
-        JOIN owner o ON p.OwnerID = o.OwnerID
-        JOIN veterinarian v ON a.VetID = v.VetID
-        ORDER BY a.Date DESC";
+// Get all pets for dropdown using stored procedure
+$conn->next_result(); // Clear previous result set
+$stmt = $conn->prepare("CALL GetPetsWithOwners()");
+$stmt->execute();
+$pets_result = $stmt->get_result();
+$stmt->close();
 
-$result = mysqli_query($conn, $sql);
+// Get vets for dropdown using stored procedure
+$conn->next_result(); // Clear previous result set
+$stmt = $conn->prepare("CALL GetOwnersForDropdown()");
+$stmt->execute();
+$vets_result = $stmt->get_result();
+$stmt->close();
+
+// Get owners for dropdown using stored procedure
+$conn->next_result(); // Clear previous result set
+$stmt = $conn->prepare("CALL GetOwnersForDropdown()");
+$stmt->execute();
+$owners_result = $stmt->get_result();
+$stmt->close();
+
+// Get current logged in owner ID if available
+$owner_id = $_SESSION['owner_id'] ?? null;
+$current_owner_name = '';
+
+if ($owner_id) {
+    $conn->next_result(); // Clear previous result set
+    $stmt = $conn->prepare("CALL GetOwnerById(?)");
+    $stmt->bind_param("i", $owner_id);
+    $stmt->execute();
+    $owner_result = $stmt->get_result();
+    if ($owner_data = mysqli_fetch_assoc($owner_result)) {
+        $current_owner_name = $owner_data['FirstName'] . ' ' . $owner_data['LastName'];
+    }
+    $stmt->close();
+    
+    // Get pets for this owner only
+    $conn->next_result(); // Clear previous result set
+    $stmt = $conn->prepare("CALL GetPetsByOwnerID(?)");
+    $stmt->bind_param("i", $owner_id);
+    $stmt->execute();
+    $owner_pets_result = $stmt->get_result();
+    $stmt->close();
+}
 ?>
 
 <div class="container mt-4">
@@ -30,13 +61,16 @@ $result = mysqli_query($conn, $sql);
             <p class="text-muted">Manage pet appointments and schedules</p>
         </div>
         <div class="col-auto">
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAppointmentModal">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAppointmentModal" 
+                <?php if($current_owner_name): ?>
+                    data-owner="<?php echo htmlspecialchars($current_owner_name); ?>"
+                <?php endif; ?>>
                 <i class="fas fa-plus"></i> New Appointment
             </button>
         </div>
     </div>
 
-    <!-- Display success/error messages --
+    <!-- Display success/error messages -->
     <?php
     if (isset($_GET['success'])) {
         echo '<div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -148,35 +182,88 @@ $result = mysqli_query($conn, $sql);
             </div>
             <div class="modal-body">
                 <form id="appointmentForm" action="appointment_process.php" method="post">
-                    <!-- Pet information as text inputs -->
-                    <div class="form-group">
-                        <label for="petName">Pet Name</label>
-                        <input type="text" class="form-control" id="petName" name="petName" placeholder="Enter pet name" required>
+                    <input type="hidden" name="action" value="create">
+                    <?php if ($owner_id): ?>
+                        <!-- If owner is logged in, only show their pets -->
+                        <div class="form-group mb-3">
+                            <label for="petID">Select Your Pet</label>
+                            <select class="form-control" id="petID" name="petID" required>
+                                <option value="">Select a pet</option>
+                                <?php 
+                                while ($pet = mysqli_fetch_assoc($owner_pets_result)):
+                                ?>
+                                <option value="<?= $pet['PetID'] ?>"><?= htmlspecialchars($pet['PetName']) ?></option>
+                                <?php endwhile; ?>
+                            </select>
+                        </div>
+                        
+                        <!-- Hidden field for owner -->
+                        <input type="hidden" name="ownerID" value="<?= $owner_id ?>">
+                        
+                        <!-- Display owner name as non-editable -->
+                        <div class="form-group mb-3">
+                            <label>Owner</label>
+                            <input type="text" class="form-control" value="<?= htmlspecialchars($current_owner_name) ?>" readonly>
+                        </div>
+                    <?php else: ?>
+                        <!-- If not logged in as owner, show selection form -->
+                        <div class="form-group mb-3">
+                            <label for="petID">Select Pet</label>
+                            <select class="form-control" id="petID" name="petID" required>
+                                <option value="">Select a pet</option>
+                                <?php 
+                                while ($pet = mysqli_fetch_assoc($pets_result)):
+                                ?>
+                                <option value="<?= $pet['PetID'] ?>" data-owner="<?= htmlspecialchars($pet['OwnerName']) ?>">
+                                    <?= htmlspecialchars($pet['PetName']) ?> (<?= htmlspecialchars($pet['OwnerName']) ?>)
+                                </option>
+                                <?php endwhile; ?>
+                            </select>
+                        </div>
+                        <!-- Display calculated owner name -->
+                        <div class="form-group mb-3">
+                            <label>Owner Name</label>
+                            <input type="text" class="form-control" id="ownerDisplay" readonly>
+                        </div>
+                    <?php endif; ?>
+                    
+                    <!-- Veterinarian Selection -->
+                    <div class="form-group mb-3">
+                        <label for="vetID">Veterinarian</label>
+                        <select class="form-control" id="vetID" name="vetID" required>
+                            <option value="">Select a veterinarian</option>
+                            <?php 
+                            while ($vet = mysqli_fetch_assoc($vets_result)):
+                            ?>
+                            <option value="<?= $vet['VetID'] ?>">
+                                Dr. <?= htmlspecialchars($vet['VetName']) ?> (<?= htmlspecialchars($vet['Specialization']) ?>)
+                            </option>
+                            <?php endwhile; ?>
+                        </select>
                     </div>
-
-                    <div class="form-group">
-                        <label for="ownerName">Owner Name</label>
-                        <input type="text" class="form-control" id="ownerName" name="ownerName" placeholder="Enter owner name" required>
-                    </div>
                     
-                    
-                    
-                    <div class="form-group">
+                    <!-- Date and Time -->
+                    <div class="form-group mb-3">
                         <label for="date">Date</label>
                         <input type="date" class="form-control" id="date" name="date" required>
                     </div>
                     
-                    <div class="form-group">
+                    <div class="form-group mb-3">
                         <label for="time">Time</label>
                         <input type="time" class="form-control" id="time" name="time" required>
                     </div>
                     
-                    <div class="form-group">
+                    <div class="form-group mb-3">
                         <label for="reason">Reason</label>
                         <textarea class="form-control" id="reason" name="reason" rows="3" required></textarea>
                     </div>
                     
-                    <div class="form-group">
+                    <div class="form-group mb-3">
+                        <label for="notes">Additional Notes</label>
+                        <textarea class="form-control" id="notes" name="notes" rows="2"></textarea>
+                    </div>
+                    
+                    <div class="form-group mb-3">
                         <label for="status">Status</label>
                         <select class="form-control" id="status" name="status">
                             <option value="Scheduled">Scheduled</option>
@@ -195,8 +282,24 @@ $result = mysqli_query($conn, $sql);
 </div>
 
 <script>
-// Add your JavaScript for handling form submissions, filtering, etc.
-$(document).ready(function() {
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-populate owner name when pet is selected
+    const petSelect = document.getElementById('petID');
+    if (petSelect) {
+        petSelect.addEventListener('change', function() {
+            const ownerDisplay = document.getElementById('ownerDisplay');
+            if (ownerDisplay) {
+                const selectedOption = this.options[this.selectedIndex];
+                const ownerName = selectedOption.getAttribute('data-owner');
+                if (ownerName) {
+                    ownerDisplay.value = ownerName;
+                } else {
+                    ownerDisplay.value = '';
+                }
+            }
+        });
+    }
+    
     // Search and filter functionality
     $("#searchFilter").on("keyup", function() {
         var value = $(this).val().toLowerCase();

@@ -23,17 +23,18 @@ if(isset($_POST['signup'])) {
         $error = "Passwords do not match. Please try again.";
     } else {
         // Check if email already exists
-        $stmt = $conn->prepare("CALL CheckEmailExists(?)");
+        $stmt = $conn->prepare("CALL CheckEmailExists(?, @email_exists)");
         $stmt->bind_param("s", $email);
         $stmt->execute();
-        $check_email = $stmt->get_result();
-        
-        if(mysqli_num_rows($check_email) > 0) {
-            $error = "Email already exists. Please use a different email or login.";
+        $conn->query("SELECT @email_exists AS email_exists");
+        $result = $conn->query("SELECT @email_exists AS email_exists");
+        $row = $result->fetch_assoc();
+
+        if ($row['email_exists']) {
+            // Email already exists
+            $error = "Email already registered. Please use a different email.";
         } else {
-            // Close the first statement
-            $stmt->close();
-            
+            // Email is available, proceed with registration
             // Hash password
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
             

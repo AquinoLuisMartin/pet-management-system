@@ -71,14 +71,6 @@
                 <span class="menu-text">Logout</span>
             </a>
         </div>
-        <div class="sidebar-menu">
-            <?php if(isset($_SESSION['owner_id'])): ?>
-            <a href="logout.php" class="menu-item">
-                <i class="fas fa-sign-out-alt"></i>
-                <span class="menu-text">Logout</span>
-            </a>
-            <?php endif; ?>
-        </div>
     </div>
     
     <!-- Main Content Area -->
@@ -95,21 +87,4 @@
             </div>
         </div>
 
-        <!-- Inside the user-dropdown div -->
-        <div class="user-dropdown">
-            <?php if(isset($_SESSION['owner_id'])): ?>
-            <div class="dropdown">
-                <button class="btn dropdown-toggle" type="button" id="userMenu" data-bs-toggle="dropdown" aria-expanded="false">
-                    <img src="https://via.placeholder.com/40" alt="User" class="user-avatar">
-                    <span><?php echo $_SESSION['owner_name']; ?></span>
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
-                    <li><a class="dropdown-item" href="profile.php"><i class="fas fa-user-circle"></i> My Profile</a></li>
-                    <li><a class="dropdown-item" href="settings.php"><i class="fas fa-cog"></i> Settings</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item" href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
-                </ul>
-            </div>
-            <?php else: ?>
-            <?php endif; ?>
-        </div>
+       

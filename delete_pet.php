@@ -5,8 +5,6 @@ include "includes/db_conn.php";
 if(isset($_GET['id'])) {
     $id = $_GET['id'];
     
-    // Debug output
-    file_put_contents('delete_log.txt', "Deleting pet ID: $id at " . date('Y-m-d H:i:s') . "\n", FILE_APPEND);
     
     // Use stored procedure to delete the pet
     $stmt = $conn->prepare("CALL DeletePet(?)");

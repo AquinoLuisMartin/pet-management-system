@@ -1,7 +1,7 @@
 # Pet Management System
 
 ## Overview
-The Pet Management System is a web application designed to manage pet records. It allows users to add, edit, delete, and view pet information in a user-friendly interface.
+The Pet Management System is a web application designed to manage pet records, appointments, veterinarians, and billing. It allows veterinary clinics to manage their operations efficiently.
 
 ## Project Structure
 ```
@@ -23,21 +23,24 @@ pet-management-system
 ```
 
 ## Features
-- **Add New Pet**: Users can add new pet records through a form.
-- **Edit Pet Information**: Users can edit existing pet records.
-- **Delete Pet Records**: Users can delete pet records from the database.
-- **View Pet List**: The main page displays a list of all pets in the system.
+- **User Authentication**: Secure login for pet owners and staff
+- **Pet Management**: Add, edit, and view pet records
+- **Owner Management**: Track pet owner information
+- **Veterinarian Profiles**: Manage veterinary staff details
+- **Appointment Scheduling**: Book and manage pet appointments
+- **Billing and Payments**: Track services and payments
+
+## Database Structure
+- **owner**: Pet owners' personal information and authentication details
+- **pet**: Pet records linked to their owners
+- **veterinarian**: Information about veterinary staff
+- **appointment**: Scheduled appointments with composite primary key
+- **billingpayment**: Payment records for veterinary services
 
 ## Setup Instructions
-1. Clone the repository to your local machine.
-2. Navigate to the project directory.
-3. Ensure you have a local server environment (e.g., XAMPP, WAMP) set up.
-4. Create a database named `Pet` and import the necessary SQL schema (if provided).
-5. Update the `db_conn.php` file with your database credentials.
-6. Access the application through your web browser at `http://localhost/pet-management-system/index.php`.
+1. Clone the repository: `git clone https://github.com/AquinoLuisMartin/pet-management-system.git`
+2. Navigate to the project directory
+3. Set up your local server environment (e.g., XAMPP, WAMP)
+4. Create a database named `Pet`
+5. Import the database schema:
 
-## Usage
-- To add a new pet, click on the "Add New Pet" button on the main page.
-- To edit a pet, click the edit icon next to the pet's record.
-- To delete a pet, click the delete icon next to the pet's record.
-- The main page will always display the current list of pets in the system.

@@ -49,7 +49,7 @@ if (isset($_GET["msg"])) {
                             <td><?php echo $row["Species"]; ?></td>
                             <td><?php echo $row["Breed"]; ?></td>
                             <td><?php echo $row["Gender"]; ?></td>
-                            <td><?php echo $row["OwnerName"]; ?></td>
+                            <td><?php echo isset($row["OwnerName"]) ? $row["OwnerName"] : $row["OwnerID"]; ?></td>
                             <td>
                                 <a href="view_pet.php?id=<?php echo $row["PetID"]; ?>" class="btn btn-sm btn-info">
                                     <i class="fas fa-eye"></i>
