@@ -1,11 +1,34 @@
 <?php
 include "includes/db_conn.php";
 include "includes/header.php";
+session_start();
+
+// Display success/error messages
+if (isset($_SESSION['success_message'])) {
+    echo '<div class="alert alert-success alert-dismissible fade show" role="alert">
+            ' . $_SESSION['success_message'] . '
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>';
+    unset($_SESSION['success_message']);
+}
+
+if (isset($_SESSION['error_message'])) {
+    echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">
+            ' . $_SESSION['error_message'] . '
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>';
+    unset($_SESSION['error_message']);
+}
 
 // Get all veterinarians - Using Stored Procedure
 $sql = "CALL GetAllVeterinariansWithStats()";
-
 $result = mysqli_query($conn, $sql) or die("Query failed: " . mysqli_error($conn));
+
+// Get ID of newly added veterinarian if any
+$newVetID = $_SESSION['new_vet_id'] ?? null;
+if (isset($_SESSION['new_vet_id'])) {
+    unset($_SESSION['new_vet_id']);
+}
 ?>
 
 <div class="container mt-4">
@@ -15,7 +38,7 @@ $result = mysqli_query($conn, $sql) or die("Query failed: " . mysqli_error($conn
             <p class="text-muted">Manage veterinary staff information</p>
         </div>
         <div class="col-auto">
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addVetModal">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addVetModal">
                 <i class="fas fa-plus"></i> Add Veterinarian
             </button>
         </div>
@@ -26,11 +49,14 @@ $result = mysqli_query($conn, $sql) or die("Query failed: " . mysqli_error($conn
         <?php
         if (mysqli_num_rows($result) > 0) {
             while ($row = mysqli_fetch_assoc($result)) {
+                // Check if this is the newly added vet
+                $highlightClass = ($row['VetID'] == $newVetID) ? 'border-success border-3' : '';
+                
                 echo '<div class="col-lg-4 col-md-6 mb-4">
-                    <div class="card h-100">
+                    <div class="card h-100 ' . $highlightClass . '">
                         <div class="card-body">
                             <div class="d-flex align-items-center mb-3">
-                                <div class="avatar-circle mr-3">
+                                <div class="avatar-circle me-3">
                                     <span class="initials">' . substr($row['FirstName'], 0, 1) . substr($row['LastName'], 0, 1) . '</span>
                                 </div>
                                 <div>
@@ -46,7 +72,7 @@ $result = mysqli_query($conn, $sql) or die("Query failed: " . mysqli_error($conn
                             
                             <div class="mb-3">
                                 <small class="text-muted d-block">Phone</small>
-                                <a href="tel:' . $row['Phone'] . '" class="text-decoration-none">' . $row['Phone'] . '</a>
+                                <a href="tel:' . $row['ContactNumber'] . '" class="text-decoration-none">' . $row['ContactNumber'] . '</a>
                             </div>
                             
                             <div class="row">
@@ -88,71 +114,54 @@ $result = mysqli_query($conn, $sql) or die("Query failed: " . mysqli_error($conn
 </div>
 
 <!-- Add Veterinarian Modal -->
-<div class="modal fade" id="addVetModal" tabindex="-1" role="dialog" aria-labelledby="addVetModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
+<div class="modal fade" id="addVetModal" tabindex="-1" aria-labelledby="addVetModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="addVetModalLabel">Add New Veterinarian</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form id="vetForm" action="vet_process.php" method="post">
+                    <input type="hidden" name="action" value="create">
+                    
                     <div class="row">
                         <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="firstName">First Name</label>
+                            <div class="mb-3">
+                                <label for="firstName" class="form-label">First Name</label>
                                 <input type="text" class="form-control" id="firstName" name="firstName" required>
                             </div>
                             
-                            <div class="form-group">
-                                <label for="lastName">Last Name</label>
+                            <div class="mb-3">
+                                <label for="lastName" class="form-label">Last Name</label>
                                 <input type="text" class="form-control" id="lastName" name="lastName" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="email">Email</label>
-                                <input type="email" class="form-control" id="email" name="email" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="phone">Phone</label>
-                                <input type="tel" class="form-control" id="phone" name="phone" required>
                             </div>
                         </div>
                         
                         <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="specialization">Specialization</label>
-                                <input type="text" class="form-control" id="specialization" name="specialization">
+                            <div class="mb-3">
+                                <label for="specialization" class="form-label">Specialization</label>
+                                <input type="text" class="form-control" id="specialization" name="specialization" 
+                                placeholder="e.g., Small Animals, Exotic Pets, Surgery" required>
                             </div>
                             
-                            <div class="form-group">
-                                <label for="license">License Number</label>
-                                <input type="text" class="form-control" id="license" name="license">
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="education">Education</label>
-                                <input type="text" class="form-control" id="education" name="education">
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="hireDate">Hire Date</label>
-                                <input type="date" class="form-control" id="hireDate" name="hireDate">
+                            <div class="mb-3">
+                                <label for="contactNumber" class="form-label">Contact Number</label>
+                                <input type="tel" class="form-control" id="contactNumber" name="contactNumber" 
+                                pattern="[0-9\-\+]+" placeholder="e.g., 555-123-4567" required>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="form-group">
-                        <label for="notes">Notes</label>
-                        <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" 
+                        placeholder="e.g., doctor@vetclinic.com" required>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <button type="submit" form="vetForm" class="btn btn-primary">Save</button>
             </div>
         </div>

@@ -11,47 +11,71 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $time = $_POST['time'];
     $reason = mysqli_real_escape_string($conn, $_POST['reason']);
     $status = $_POST['status'];
+    $notes = isset($_POST['notes']) ? mysqli_real_escape_string($conn, $_POST['notes']) : '';
     
-    // First check if we can find this pet by name and owner
+    // First parse owner name
     $owner_parts = explode(' ', $ownerName);
     $lastName = end($owner_parts);
     $firstName = reset($owner_parts);
     
-    $find_pet_sql = "SELECT p.PetID 
-                    FROM pet p 
-                    JOIN owner o ON p.OwnerID = o.OwnerID 
-                    WHERE p.Name = '$petName' 
-                    AND (o.FirstName LIKE '%$firstName%' AND o.LastName LIKE '%$lastName%')";
     
-    $pet_result = mysqli_query($conn, $find_pet_sql);
     
-    if (mysqli_num_rows($pet_result) > 0) {
+    $stmt = $conn->prepare("CALL FindPetByNameAndOwner(?, ?, ?)");
+    $stmt->bind_param("sss", $petName, $firstName, $lastName);
+    $stmt->execute();
+    $pet_result = $stmt->get_result();
+    $stmt->close();
+    
+    if ($pet_result->num_rows > 0) {
         // Found the pet, use its ID
-        $petID = mysqli_fetch_assoc($pet_result)['PetID'];
+        $petID = $pet_result->fetch_assoc()['PetID'];
     } else {
-        // Pet not found, create new pet and owner records
-        // First create the owner
-        $create_owner = "INSERT INTO owner (FirstName, LastName) VALUES ('$firstName', '$lastName')";
-        mysqli_query($conn, $create_owner);
-        $ownerID = mysqli_insert_id($conn);
+        // Pet not found, create new owner first using existing RegisterOwner procedure
+        $conn->next_result();
+        $hashedPassword = password_hash(uniqid(), PASSWORD_DEFAULT); // Generate random password
+        $email = strtolower($firstName . '.' . $lastName . '@example.com'); // Generate email
+        $phone = ''; // Empty phone
+        $address = ''; // Empty address
         
-        // Then create the pet
-        $create_pet = "INSERT INTO pet (Name, OwnerID) VALUES ('$petName', $ownerID)";
-        mysqli_query($conn, $create_pet);
-        $petID = mysqli_insert_id($conn);
+        $stmt = $conn->prepare("CALL RegisterOwner(?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("ssssss", $firstName, $lastName, $phone, $email, $address, $hashedPassword);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $owner = $result->fetch_assoc();
+        $ownerID = $owner['OwnerID'];
+        $stmt->close();
+        
+        // Then create pet using CreatePet procedure
+        $conn->next_result();
+        $species = ''; // Default empty values
+        $breed = '';
+        $dob = date('Y-m-d'); // Today's date as default
+        $gender = '';
+        $weight = 0.0;
+        $medicalConditions = '';
+        
+        $stmt = $conn->prepare("CALL CreatePet(?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("isssssds", $ownerID, $petName, $species, $breed, $dob, $gender, $weight, $medicalConditions);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $pet = $result->fetch_assoc();
+        $petID = $pet['PetID'];
+        $stmt->close();
     }
     
-    // Now create the appointment using the pet ID
-    $sql = "INSERT INTO appointment (PetID, VetID, Date, Time, Reason, Status)
-            VALUES ($petID, $vetID, '$date', '$time', '$reason', '$status')";
-
-    if (mysqli_query($conn, $sql)) {
+    // Now create the appointment using the CreateAppointment procedure
+    $conn->next_result();
+    $stmt = $conn->prepare("CALL CreateAppointment(?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("iissss", $petID, $vetID, $date, $time, $reason, $notes, $status);
+    
+    if ($stmt->execute()) {
         header("Location: appointment.php?success=Appointment added successfully");
         exit();
     } else {
-        header("Location: appointment.php?error=" . urlencode(mysqli_error($conn)));
+        header("Location: appointment.php?error=" . urlencode($stmt->error));
         exit();
     }
+    $stmt->close();
 }
 
 // Handle appointment edit
@@ -68,26 +92,22 @@ if (isset($_POST['edit'])) {
     $time = $_POST['time'];
     $reason = mysqli_real_escape_string($conn, $_POST['reason']);
     $status = $_POST['status'];
+    $notes = isset($_POST['notes']) ? mysqli_real_escape_string($conn, $_POST['notes']) : '';
+    
 
-    // Delete old appointment
-    $delete_sql = "DELETE FROM appointment 
-                   WHERE PetID = $oldPetID 
-                   AND VetID = $oldVetID 
-                   AND Date = '$oldDate' 
-                   AND Time = '$oldTime'";
-    mysqli_query($conn, $delete_sql);
-
-    // Insert updated appointment
-    $insert_sql = "INSERT INTO appointment (PetID, VetID, Date, Time, Reason, Status)
-                   VALUES ($petID, $vetID, '$date', '$time', '$reason', '$status')";
-
-    if (mysqli_query($conn, $insert_sql)) {
+    
+    $stmt = $conn->prepare("CALL UpdateAppointment(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("iiissiissss", $oldPetID, $oldVetID, $oldDate, $oldTime, 
+                     $petID, $vetID, $date, $time, $reason, $notes, $status);
+    
+    if ($stmt->execute()) {
         header("Location: appointment.php?success=Appointment updated successfully");
         exit();
     } else {
-        header("Location: appointment.php?error=" . urlencode(mysqli_error($conn)));
+        header("Location: appointment.php?error=" . urlencode($stmt->error));
         exit();
     }
+    $stmt->close();
 }
 
 // Handle appointment delete
@@ -100,20 +120,18 @@ if (isset($_GET['action']) && $_GET['action'] == 'delete') {
         $vetID = $parts[1];
         $date = $parts[2];
         $time = $parts[3];
-
-        $sql = "DELETE FROM appointment 
-                WHERE PetID = $petID 
-                AND VetID = $vetID 
-                AND Date = '$date' 
-                AND Time = '$time'";
-
-        if (mysqli_query($conn, $sql)) {
+        
+        $stmt = $conn->prepare("CALL DeleteAppointment(?, ?, ?, ?)");
+        $stmt->bind_param("iiss", $petID, $vetID, $date, $time);
+        
+        if ($stmt->execute()) {
             header("Location: appointment.php?success=Appointment deleted successfully");
             exit();
         } else {
-            header("Location: appointment.php?error=" . urlencode(mysqli_error($conn)));
+            header("Location: appointment.php?error=" . urlencode($stmt->error));
             exit();
         }
+        $stmt->close();
     } else {
         header("Location: appointment.php?error=Invalid appointment ID format");
         exit();
