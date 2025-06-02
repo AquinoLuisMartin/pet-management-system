@@ -100,8 +100,9 @@ a {
 }
 
 .menu-item:hover {
-  background-color: var(--primary-light);
-  color: var(--primary-color);
+  background-color: transparent;
+  color: inherit;
+  transform: none;
 }
 
 .menu-item.active {
@@ -459,4 +460,409 @@ a {
   .notification-bell {
     display: none;
   }
+}
+
+/* ===== ANIMATION KEYFRAMES ===== */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeInDown {
+    from { opacity: 0; transform: translate3d(0, -20px, 0); }
+    to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translate3d(0, 20px, 0); }
+    to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@keyframes fadeInLeft {
+    from { opacity: 0; transform: translate3d(-20px, 0, 0); }
+    to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@keyframes fadeInRight {
+    from { opacity: 0; transform: translate3d(20px, 0, 0); }
+    to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@keyframes fadeOutDown {
+    from { opacity: 1; transform: translate3d(0, 0, 0); }
+    to { opacity: 0; transform: translate3d(0, 20px, 0); }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-5px); }
+    40%, 80% { transform: translateX(5px); }
+}
+
+@keyframes ripple {
+    to { transform: scale(4); opacity: 0; }
+}
+
+@keyframes slideIn {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-10px); }
+    60% { transform: translateY(-5px); }
+}
+
+/* ===== ANIMATION CLASSES ===== */
+.fade-in { animation: fadeIn 0.5s ease forwards; }
+.fade-in-down { animation: fadeInDown 0.5s ease forwards; }
+.fade-in-up { animation: fadeInUp 0.5s ease forwards; }
+.fade-in-left { animation: fadeInLeft 0.5s ease forwards; }
+.fade-in-right { animation: fadeInRight 0.5s ease forwards; }
+.fade-out-down { animation: fadeOutDown 0.3s ease forwards; }
+.pulse { animation: pulse 0.5s ease; }
+.shake-animation { animation: shake 0.5s ease-in-out; }
+.bounce { animation: bounce 1s ease; }
+
+/* Staggered animations for multiple elements */
+.stagger-item:nth-child(1) { animation-delay: 0.1s; }
+.stagger-item:nth-child(2) { animation-delay: 0.2s; }
+.stagger-item:nth-child(3) { animation-delay: 0.3s; }
+.stagger-item:nth-child(4) { animation-delay: 0.4s; }
+.stagger-item:nth-child(5) { animation-delay: 0.5s; }
+.stagger-item:nth-child(6) { animation-delay: 0.6s; }
+.stagger-item:nth-child(7) { animation-delay: 0.7s; }
+.stagger-item:nth-child(8) { animation-delay: 0.8s; }
+
+/* ===== LOGIN/SIGNUP ANIMATIONS ===== */
+.auth-container {
+    opacity: 0;
+    animation: fadeInDown 0.8s ease forwards;
+}
+
+.auth-logo {
+    opacity: 0;
+    animation: fadeIn 1s ease 0.3s forwards;
+}
+
+.auth-header {
+    opacity: 0;
+    animation: fadeInDown 0.8s ease 0.4s forwards;
+}
+
+.auth-form .form-group {
+    opacity: 0;
+    animation: fadeInUp 0.5s ease forwards;
+}
+
+.auth-form .form-group:nth-child(1) { animation-delay: 0.5s; }
+.auth-form .form-group:nth-child(2) { animation-delay: 0.6s; }
+.auth-form .form-group:nth-child(3) { animation-delay: 0.7s; }
+.auth-form .form-group:nth-child(4) { animation-delay: 0.8s; }
+.auth-form .form-group:nth-child(5) { animation-delay: 0.9s; }
+
+.auth-form button[type="submit"] {
+    opacity: 0;
+    animation: fadeInUp 0.5s ease 1s forwards;
+}
+
+.auth-toggle {
+    opacity: 0;
+    animation: fadeIn 0.5s ease 1.2s forwards;
+}
+
+.login-error, .signup-error {
+    animation: shake 0.5s ease-in-out;
+}
+
+/* Login/signup form focus effects */
+.form-group {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    position: absolute;
+    top: 12px;
+    left: 16px;
+    color: var(--text-light);
+    pointer-events: none;
+    transition: all 0.2s ease;
+}
+
+.form-group.focused label {
+    top: -10px;
+    left: 12px;
+    font-size: 12px;
+    color: var(--primary-color);
+    background: var(--white);
+    padding: 0 5px;
+}
+
+.form-control {
+    transition: all 0.2s ease;
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(30, 136, 229, 0.25);
+}
+
+/* Password visibility toggle */
+.password-toggle {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    z-index: 10;
+    color: var(--text-light);
+    transition: all 0.2s ease;
+}
+
+.password-toggle:hover {
+    color: var(--text-light);
+}
+
+/* ===== BUTTON ANIMATIONS ===== */
+.btn {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: none;
+    box-shadow: none;
+    filter: none;
+}
+
+.btn:active {
+    transform: translateY(1px);
+}
+
+/* Ripple effect for buttons */
+.ripple-effect {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.4);
+    transform: scale(0);
+    animation: ripple 0.6s linear;
+    pointer-events: none;
+}
+
+/* Button highlight effects for actions */
+.btn-primary:hover, .btn-success:hover, .btn-danger:hover {
+    filter: brightness(110%);
+}
+
+/* CRUD button hover animations */
+.view-btn:hover i {
+    animation: none;
+}
+
+.edit-btn:hover i {
+    animation: none;
+}
+
+.delete-btn:hover i {
+    animation: none;
+}
+
+.add-btn:hover {
+    animation: none;
+}
+
+/* ===== CARD & ELEMENT ANIMATIONS ===== */
+.card {
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: none;
+    box-shadow: var(--card-shadow);
+}
+
+.feature-card {
+    transition: all 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: none;
+    box-shadow: var(--card-shadow);
+}
+
+.feature-card:hover .feature-icon {
+    animation: none;
+}
+
+/* Dashboard stat cards */
+.stat-card {
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: none;
+    box-shadow: var(--card-shadow);
+}
+
+/* ===== TABLE ANIMATIONS ===== */
+.table tbody tr {
+    transition: all 0.2s ease;
+}
+
+.table tbody tr:hover {
+    background-color: transparent;
+    transform: none;
+}
+
+/* Row highlighting */
+.row-highlight {
+    background-color: rgba(30, 136, 229, 0.05);
+}
+
+/* ===== MODAL ANIMATIONS ===== */
+.modal-dialog {
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: all 0.3s ease;
+}
+
+.modal.show .modal-dialog {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.modal-content {
+    box-shadow: 0 15px 35px rgba(50,50,93,.1), 0 5px 15px rgba(0,0,0,.07);
+}
+
+/* ===== ALERT & NOTIFICATION ANIMATIONS ===== */
+.alert {
+    opacity: 0;
+    animation: fadeInDown 0.5s ease forwards;
+}
+
+.alert-dismissible .btn-close:hover {
+    transform: none;
+    transition: all 0.3s ease;
+}
+
+/* Notification bell animation */
+.notification-bell:hover i {
+    animation: none;
+}
+
+.notification-indicator {
+    animation: pulse 2s infinite;
+}
+
+/* ===== SIDEBAR ANIMATIONS ===== */
+.sidebar {
+    transition: transform 0.3s ease, width 0.3s ease;
+}
+
+.menu-item {
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.menu-item:hover {
+    transform: translateX(5px);
+}
+
+.menu-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 3px;
+    background-color: var(--primary-color);
+    animation: fadeIn 0.3s ease forwards;
+}
+
+/* ===== LOADING ANIMATIONS ===== */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    animation: fadeIn 0.3s ease forwards;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(30, 136, 229, 0.1);
+    border-radius: 50%;
+    border-top-color: var(--primary-color);
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* ===== APPOINTMENT CALENDAR ANIMATIONS ===== */
+/* Your existing calendar styles plus animations */
+.fc-daygrid-day.fc-day-has-event {
+    background-color: rgba(30, 136, 229, 0.15);
+    transition: all 0.3s ease;
+}
+
+.fc-daygrid-day.fc-day-has-event:hover {
+    background-color: rgba(30, 136, 229, 0.15);
+    transform: none;
+}
+
+.fc .fc-daygrid-day.fc-day-today {
+    background-color: rgba(255, 220, 40, 0.15);
+    transition: all 0.3s ease;
+}
+
+.fc .fc-daygrid-day.fc-day-today:hover {
+    background-color: rgba(255, 220, 40, 0.15);
+}
+
+.fc-event {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.fc-event:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+/* Animation for day hover */
+.fc-day:hover {
+    background-color: transparent;
+}
+
+/* Make calendar responsive */
+@media (max-width: 768px) {
+    .fc .fc-toolbar {
+        display: block;
+        text-align: center;
+    }
+    
+    .fc .fc-toolbar-chunk {
+        display: block;
+        margin-bottom: 10px;
+    }
 }

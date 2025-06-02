@@ -57,7 +57,7 @@ if(isset($_POST['login'])) {
         body {
             background-color: #f8f9fa;
         }
-        .login-container {
+        .auth-container {
             max-width: 500px;
             margin: 100px auto;
             padding: 30px;
@@ -65,29 +65,39 @@ if(isset($_POST['login'])) {
             border-radius: 10px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
         }
-        .logo-area {
+        .auth-logo {
             text-align: center;
             margin-bottom: 30px;
         }
-        .logo-area img {
+        .auth-logo img {
             max-width: 150px;
+        }
+        .auth-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .auth-form {
+            /* Add any specific styles for the form here */
+        }
+        .auth-toggle {
+            text-align: center;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="login-container">
-            <div class="logo-area">
+        <div class="auth-container">
+            <div class="auth-logo">
                 <i class="fas fa-paw fa-4x text-primary"></i>
-                <h2 class="mt-3">Pet Management System</h2>
-                <p class="text-muted">Login to your account</p>
             </div>
+            <h2 class="auth-header">Login to Your Account</h2>
             
             <?php if(isset($error)): ?>
                 <div class="alert alert-danger"><?php echo $error; ?></div>
             <?php endif; ?>
             
-            <form action="" method="post">
+            <form class="auth-form" action="" method="post">
                 <div class="mb-3">
                     <label for="email" class="form-label">Email Address</label>
                     <input type="email" class="form-control" id="email" name="email" required>
@@ -108,7 +118,7 @@ if(isset($_POST['login'])) {
                 </div>
             </form>
             
-            <div class="text-center mt-3">
+            <div class="auth-toggle">
                 <p>Don't have an account? <a href="signup.php">Sign Up</a></p>
             </div>
         </div>

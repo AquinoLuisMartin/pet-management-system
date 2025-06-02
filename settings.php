@@ -90,11 +90,6 @@ if (isset($_POST['save_settings'])) {
                                     <input type="text" class="form-control" id="clinic_hours" name="clinic_hours" value="<?php echo $clinic_hours; ?>" required>
                                 </div>
                                 
-                                <div class="mb-3">
-                                    <label for="clinic_logo" class="form-label">Clinic Logo</label>
-                                    <input type="file" class="form-control" id="clinic_logo" name="clinic_logo">
-                                </div>
-                                
                                 <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                                     <button type="submit" name="save_settings" class="btn btn-primary">Save Changes</button>
                                 </div>

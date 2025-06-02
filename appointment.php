@@ -17,7 +17,7 @@ $stmt->close();
 
 // Get vets for dropdown using stored procedure
 $conn->next_result(); // Clear previous result set
-$stmt = $conn->prepare("CALL GetOwnersForDropdown()");
+$stmt = $conn->prepare("CALL GetAllVetsForDropdown()");
 $stmt->execute();
 $vets_result = $stmt->get_result();
 $stmt->close();
