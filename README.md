@@ -5,55 +5,50 @@ The Pet Management System is a web application designed to manage pet records, a
 
 ## Project Structure
 ```
-pet-management-system
-├── assets
-│   ├── css
+pet-management-system/
+├── assets/
+│   ├── css/
 │   │   └── style.css
-│   └── js
+│   └── js/
 │       └── script.js
-├── includes
+├── includes/
 │   ├── db_conn.php
 │   ├── header.php
 │   └── footer.php
+├── modules/
+│   ├── owners/
+│   │   ├── owners.php
+│   │   ├── owner_view.php
+│   │   ├── owner_edit.php
+│   │   ├── owner_update.php
+│   │   └── owner_delete.php
+│   ├── pets/
+│   │   ├── pets.php
+│   │   ├── pet_view.php
+│   │   ├── pet_edit.php
+│   │   ├── pet_update.php
+│   │   └── pet_delete.php
+│   ├── veterinarians/
+│   │   ├── veterinarians.php
+│   │   ├── veterinarian_view.php
+│   │   ├── veterinarian_edit.php
+│   │   ├── veterinarian_update.php
+│   │   └── veterinarian_delete.php
+│   ├── appointments/
+│   │   ├── appointments.php
+│   │   ├── appointment_view.php
+│   │   ├── appointment_edit.php
+│   │   ├── appointment_update.php
+│   │   └── appointment_delete.php
+│   └── billing/
+│       ├── billing.php
+│       ├── billing_view.php
+│       ├── billing_edit.php
+│       ├── billing_update.php
+│       └── billing_delete.php
 ├── index.php
 ├── login.php
 ├── dashboard.php
-│
-├── // Owner Management
-├── owners.php
-├── owner_view.php
-├── owner_edit.php
-├── owner_update.php
-├── owner_delete.php
-│
-├── // Pet Management
-├── pets.php
-├── pet_view.php
-├── pet_edit.php
-├── pet_update.php
-├── pet_delete.php
-│
-├── // Veterinarian Management
-├── veterinarians.php
-├── veterinarian_view.php
-├── veterinarian_edit.php
-├── veterinarian_update.php
-├── veterinarian_delete.php
-│
-├── // Appointment Management
-├── appointments.php
-├── appointment_view.php
-├── appointment_edit.php
-├── appointment_update.php
-├── appointment_delete.php
-│
-├── // Billing Management
-├── billing.php
-├── billing_view.php
-├── billing_edit.php
-├── billing_update.php
-├── billing_delete.php
-│
 └── README.md
 ```
 
@@ -98,5 +93,4 @@ The system utilizes stored procedures for all database operations, including:
 - Bootstrap 5
 - Font Awesome for icons
 
-## License
-This project is licensed under the MIT License - see the LICENSE file for details.
+
