@@ -1,8 +1,8 @@
 <?php
-session_start(); // Add this line to ensure sessions work
+session_start(); 
 include "includes/db_conn.php";
 
-// Count data for dashboard stats using stored procedure
+
 try {
     $stmt = $conn->prepare("CALL GetDashboardStats()");
     $stmt->execute();
@@ -14,35 +14,35 @@ try {
         $vet_count = $stats['vet_count'];
         $appointment_count = $stats['appointment_count'];
     } else {
-        // Default values if procedure fails
+        
         $pet_count = 0;
         $owner_count = 0;
         $vet_count = 0;
         $appointment_count = 0;
     }
 } catch (Exception $e) {
-    // Default values if procedure fails
+    
     $pet_count = 0;
     $owner_count = 0;
     $vet_count = 0;
     $appointment_count = 0;
-    // Optionally log the error
+    
     error_log("Dashboard stats error: " . $e->getMessage());
 }
 
-// Include header
+
 include "includes/header.php";
 
-// If owner is logged in, get their pets
+
 $owner_pets = array();
 if(isset($_SESSION['owner_id'])) {
     $owner_id = $_SESSION['owner_id'];
-    // Close any previous result set
+    
     if (isset($result) && $result) {
         $result->close();
     }
     
-    // Use prepared statement with stored procedure
+    
     try {
         $stmt = $conn->prepare("CALL GetOwnerPets(?)");
         $stmt->bind_param("i", $owner_id);
@@ -61,7 +61,7 @@ if(isset($_SESSION['owner_id'])) {
 }
 ?>
 
-<!-- Welcome message for new signups -->
+
 <?php if(isset($_GET['welcome'])): ?>
 <div class="alert alert-success alert-dismissible fade show" role="alert">
     <strong>Welcome to PetCare!</strong> Your account has been created successfully.

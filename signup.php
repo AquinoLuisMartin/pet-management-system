@@ -2,13 +2,13 @@
 session_start();
 include "includes/db_conn.php";
 
-// Check if user is already logged in
+
 if(isset($_SESSION['owner_id'])) {
     header("Location: index.php");
     exit();
 }
 
-// Process signup form
+
 if(isset($_POST['signup'])) {
     $firstName = mysqli_real_escape_string($conn, $_POST['firstName']);
     $lastName = mysqli_real_escape_string($conn, $_POST['lastName']);
@@ -18,31 +18,29 @@ if(isset($_POST['signup'])) {
     $password = $_POST['password'];
     $confirmPassword = $_POST['confirmPassword'];
     
-    // Check if passwords match
+    
     if($password != $confirmPassword) {
         $error = "Passwords do not match. Please try again.";
     } else {
-        // Check if email already exists
+        
         $stmt = $conn->prepare("CALL CheckEmailExists(?, @email_exists)");
         $stmt->bind_param("s", $email);
         $stmt->execute();
         $stmt->execute();
         $stmt->close();
         
-        // Get the output parameter value
+        
         $select_result = $conn->query("SELECT @email_exists AS email_exists");
         $result = $select_result;
         $row = $result->fetch_assoc();
 
         if ($row['email_exists']) {
-            // Email already exists
+            
             $error = "Email already registered. Please use a different email.";
         } else {
-            // Email is available, proceed with registration
-            // Hash password
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
             
-            // Use stored procedure to register new owner
+            
             $stmt = $conn->prepare("CALL RegisterOwner(?, ?, ?, ?, ?, ?)");
             $stmt->bind_param("ssssss", $firstName, $lastName, $phone, $email, $address, $hashed_password);
             $stmt->execute();
@@ -50,7 +48,7 @@ if(isset($_POST['signup'])) {
             $owner_data = mysqli_fetch_assoc($result);
 
             if ($owner_data) {
-                // Set session variables
+                
                 $owner_id = $owner_data['OwnerID'];
                 $_SESSION['owner_id'] = $owner_id;
                 $_SESSION['owner_name'] = $firstName . ' ' . $lastName;
@@ -72,11 +70,11 @@ if(isset($_POST['signup'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pet Management System - Sign Up</title>
-    <!-- Bootstrap CSS -->
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
-    <!-- Custom CSS -->
+    
     <link rel="stylesheet" href="css/style.css">
     <style>
         body {
@@ -168,7 +166,7 @@ if(isset($_POST['signup'])) {
         </div>
     </div>
 
-    <!-- Bootstrap Bundle with Popper -->
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

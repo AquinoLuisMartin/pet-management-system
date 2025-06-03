@@ -2,7 +2,7 @@
 include "includes/db_conn.php";
 include "includes/header.php";
 
-// Handle messages
+
 if (isset($_GET["msg"])) {
     $msg = $_GET["msg"];
     echo '<div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -35,7 +35,7 @@ if (isset($_GET["msg"])) {
             </thead>
             <tbody>
                 <?php
-                // Use stored procedure instead of direct SQL query
+                
                 $stmt = $conn->prepare("CALL GetAllPets()");
                 $stmt->execute();
                 $result = $stmt->get_result();
@@ -74,7 +74,7 @@ if (isset($_GET["msg"])) {
     </div>
 </div>
 
-<!-- Delete confirmation modal -->
+
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -94,7 +94,7 @@ if (isset($_GET["msg"])) {
 </div>
 
 <script>
-// Add event listeners to delete buttons
+
 document.addEventListener('DOMContentLoaded', function() {
     const deleteButtons = document.querySelectorAll('.delete-btn');
     const confirmDeleteBtn = document.getElementById('confirmDelete');

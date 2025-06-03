@@ -3,7 +3,7 @@ include "includes/db_conn.php";
 include "includes/header.php";
 session_start();
 
-// Display success/error messages
+
 if (isset($_SESSION['success_message'])) {
     echo '<div class="alert alert-success alert-dismissible fade show" role="alert">
             ' . $_SESSION['success_message'] . '
@@ -20,11 +20,11 @@ if (isset($_SESSION['error_message'])) {
     unset($_SESSION['error_message']);
 }
 
-// Get all veterinarians - Using Stored Procedure
+
 $sql = "CALL GetAllVeterinariansWithStats()";
 $result = mysqli_query($conn, $sql) or die("Query failed: " . mysqli_error($conn));
 
-// Get ID of newly added veterinarian if any
+
 $newVetID = $_SESSION['new_vet_id'] ?? null;
 if (isset($_SESSION['new_vet_id'])) {
     unset($_SESSION['new_vet_id']);
@@ -44,12 +44,12 @@ if (isset($_SESSION['new_vet_id'])) {
         </div>
     </div>
 
-    <!-- Vets Grid -->
+    
     <div class="row">
         <?php
         if (mysqli_num_rows($result) > 0) {
             while ($row = mysqli_fetch_assoc($result)) {
-                // Check if this is the newly added vet
+                
                 $highlightClass = ($row['VetID'] == $newVetID) ? 'border-success border-3' : '';
                 
                 echo '<div class="col-lg-4 col-md-6 mb-4">
@@ -105,7 +105,7 @@ if (isset($_SESSION['new_vet_id'])) {
     </div>
 </div>
 
-<!-- Add Veterinarian Modal -->
+
 <div class="modal fade" id="addVetModal" tabindex="-1" aria-labelledby="addVetModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">

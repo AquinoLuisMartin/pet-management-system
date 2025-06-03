@@ -2,18 +2,18 @@
 session_start();
 include "includes/db_conn.php";
 
-// Check if user is already logged in
+
 if(isset($_SESSION['owner_id'])) {
     header("Location: index.php");
     exit();
 }
 
-// Process login form
+
 if(isset($_POST['login'])) {
     $email = mysqli_real_escape_string($conn, $_POST['email']);
     $password = $_POST['password'];
     
-    // Check if user exists - use stored procedure
+
     $stmt = $conn->prepare("CALL GetOwnerByEmail(?)");
     $stmt->bind_param("s", $email);
     $stmt->execute();
@@ -22,14 +22,14 @@ if(isset($_POST['login'])) {
     if(mysqli_num_rows($result) > 0) {
         $row = mysqli_fetch_assoc($result);
         
-        // Verify password
+        
         if(password_verify($password, $row['Password'])) {
-            // Set session variables
+            
             $_SESSION['owner_id'] = $row['OwnerID'];
             $_SESSION['owner_name'] = $row['FirstName'] . ' ' . $row['LastName'];
             $_SESSION['owner_email'] = $row['Email'];
             
-            // Redirect to dashboard
+            
             header("Location: index.php");
             exit();
         } else {
@@ -47,11 +47,11 @@ if(isset($_POST['login'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pet Management System - Login</title>
-    <!-- Bootstrap CSS -->
+   
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
-    <!-- Custom CSS -->
+   
     <link rel="stylesheet" href="css/style.css">
     <style>
         body {
@@ -77,7 +77,7 @@ if(isset($_POST['login'])) {
             margin-bottom: 20px;
         }
         .auth-form {
-            /* Add any specific styles for the form here */
+            
         }
         .auth-toggle {
             text-align: center;
@@ -124,7 +124,7 @@ if(isset($_POST['login'])) {
         </div>
     </div>
 
-    <!-- Bootstrap Bundle with Popper -->
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

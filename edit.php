@@ -5,7 +5,7 @@ include "includes/header.php";
 if (isset($_GET['id'])) {
     $id = $_GET['id'];
     
-    // Use stored procedure to get pet data
+    
     $stmt = $conn->prepare("CALL GetPetById(?)");
     $stmt->bind_param("i", $id);
     $stmt->execute();
@@ -24,7 +24,7 @@ if (isset($_POST["submit"])) {
     $conditions = mysqli_real_escape_string($conn, $_POST['conditions']);
     $owner_id = $_POST['owner_id'];
 
-    // Use stored procedure to update pet data
+    
     $stmt = $conn->prepare("CALL UpdatePet(?, ?, ?, ?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("isssssdsi", $id, $name, $species, $breed, $dob, $gender, $weight, $conditions, $owner_id);
     $result = $stmt->execute();
@@ -90,7 +90,7 @@ if (isset($_POST["submit"])) {
                         <label class="form-label">Owner:</label>
                         <select class="form-control" name="owner_id" required>
                             <?php
-                            // Use stored procedure to get owners list
+                            
                             $stmt = $conn->prepare("CALL GetAllOwners()");
                             $stmt->execute();
                             $owners = $stmt->get_result();

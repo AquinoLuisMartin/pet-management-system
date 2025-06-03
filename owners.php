@@ -3,7 +3,7 @@ include "includes/db_conn.php";
 include "includes/header.php";
 session_start();
 
-// Display success/error messages
+
 if (isset($_SESSION['success_message'])) {
     echo '<div class="alert alert-success alert-dismissible fade show" role="alert">
             ' . $_SESSION['success_message'] . '
@@ -20,7 +20,7 @@ if (isset($_SESSION['error_message'])) {
     unset($_SESSION['error_message']);
 }
 
-// Get owners with pet counts using stored procedure
+
 $stmt = $conn->prepare("CALL GetAllOwnersWithPetCount()");
 $stmt->execute();
 $result = $stmt->get_result();
@@ -34,7 +34,7 @@ $result = $stmt->get_result();
         </div>
     </div>
 
-    <!-- Search/Filter Bar -->
+     
     <div class="card mb-4">
         <div class="card-body">
             <div class="row g-3">
@@ -52,7 +52,7 @@ $result = $stmt->get_result();
         </div>
     </div>
 
-    <!-- Owners Table -->
+    
     <div class="card">
         <div class="card-body">
             <div class="table-responsive">

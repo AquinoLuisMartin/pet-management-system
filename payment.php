@@ -2,27 +2,27 @@
 include "includes/db_conn.php";
 include "includes/header.php";
 
-// Get payment data using stored procedure
+
 $stmt = $conn->prepare("CALL GetAllPayments()");
 $stmt->execute();
 $result = $stmt->get_result();
 $stmt->close();
 
-// Get total revenue using stored procedure
+
 $stmt = $conn->prepare("CALL GetTotalRevenue()");
 $stmt->execute();
 $revenue_result = $stmt->get_result();
 $total_revenue = mysqli_fetch_assoc($revenue_result)['TotalRevenue'] ?? 0;
 $stmt->close();
 
-// Get pending revenue using stored procedure
+
 $stmt = $conn->prepare("CALL GetPendingRevenue()");
 $stmt->execute();
 $pending_result = $stmt->get_result();
 $pending_revenue = mysqli_fetch_assoc($pending_result)['PendingRevenue'] ?? 0;
 $stmt->close();
 
-// Get today's payments using stored procedure
+
 $today = date('Y-m-d');
 $stmt = $conn->prepare("CALL GetTodayPayments(?)");
 $stmt->bind_param("s", $today);
@@ -47,7 +47,7 @@ $stmt->close();
         </div>
     </div>
 
-    <!-- Payment Summary Cards -->
+    
     <div class="row mb-4">
         <div class="col-md-4 mb-3">
             <div class="card bg-success text-white h-100">
@@ -91,7 +91,7 @@ $stmt->close();
         </div>
     </div>
 
-    <!-- Filter/Search Section -->
+    
     <div class="card mb-4">
         <div class="card-body">
             <form class="row g-3">
@@ -128,7 +128,7 @@ $stmt->close();
         </div>
     </div>
 
-    <!-- Payment Records Table -->
+   
     <div class="card mb-4">
         <div class="card-body">
             <div class="table-responsive">
@@ -197,7 +197,7 @@ $stmt->close();
                             <select class="form-select" id="appointmentID" name="appointmentID" required>
                                 <option value="">-- Select a pet --</option>
                                 <?php
-                                // Fetch pets for dropdown
+                                
                                 $stmt = $conn->prepare("CALL GetPetsWithOwners()");
                                 $stmt->execute();
                                 $result = $stmt->get_result();
@@ -206,7 +206,7 @@ $stmt->close();
                                     echo '<option value="' . $row['PetID'] . '">' . $row['PetName'] . ' - Owner: ' . $row['OwnerName'] . '</option>';
                                 }
                                 $stmt->close();
-                                $conn->next_result(); // Clear result set
+                                $conn->next_result(); 
                                 ?>
                             </select>
                         </div>
@@ -255,7 +255,7 @@ $stmt->close();
 
     <script>
     $(document).ready(function() {
-        // Search and filter functionality
+        
         $("#searchFilter").on("keyup", function() {
             var value = $(this).val().toLowerCase();
             $("table tbody tr").filter(function() {
@@ -263,7 +263,7 @@ $stmt->close();
             });
         });
         
-        // Method filter
+        
         $("#methodFilter").on("change", function() {
             var value = $(this).val().toLowerCase();
             if (value === "") {
@@ -275,7 +275,7 @@ $stmt->close();
             }
         });
         
-        // Status filter
+        
         $("#statusFilter").on("change", function() {
             var value = $(this).val().toLowerCase();
             if (value === "") {
@@ -287,13 +287,13 @@ $stmt->close();
             }
         });
         
-        // Date filter
+        
         $("#dateFilter").on("change", function() {
             var value = $(this).val();
             if (value === "") {
                 $("table tbody tr").show();
             } else {
-                // Format the selected date for comparison
+                
                 var selectedDate = new Date(value).toLocaleDateString('en-US', {
                     month: 'short', 
                     day: '2-digit',
@@ -307,22 +307,21 @@ $stmt->close();
             }
         });
         
-        // Edit payment button click
+        
         $(".edit-btn").on("click", function() {
             var paymentId = $(this).data("id");
             $("#addPaymentModalLabel").text("Edit Payment");
             
-            // Reset the form first
             $("#paymentForm")[0].reset();
             
-            // Add hidden payment ID field and change form action
+            
             if(!$("#payment_id").length) {
                 $("#paymentForm").append('<input type="hidden" id="payment_id" name="payment_id">');
             }
             $("#payment_id").val(paymentId);
             $("#paymentForm input[name='action']").val("edit");
             
-            // Fetch payment data via AJAX
+            
             $.ajax({
                 url: "payment_process.php",
                 type: "GET",
@@ -333,7 +332,7 @@ $stmt->close();
                 dataType: "json",
                 success: function(data) {
                     if(data) {
-                        // Populate form fields with existing data
+                        
                         $("#appointmentID").val(data.AppointmentID);
                         $("#amount").val(data.Amount);
                         $("#paymentDate").val(data.PaymentDate);
@@ -353,16 +352,14 @@ $stmt->close();
             });
         });
         
-        // Delete payment button click
+        
         $(".delete-btn").on("click", function() {
             var paymentId = $(this).data("id");
             if(confirm("Are you sure you want to delete this payment record?")) {
-                // You can implement AJAX to delete the payment
-                // Example: window.location.href = "payment_process.php?action=delete&id=" + paymentId;
             }
         });
         
-        // Generate receipt button click
+    
         $(".receipt-btn").on("click", function() {
             var paymentId = $(this).data("id");
             window.open("generate_receipt.php?id=" + paymentId, "_blank");
@@ -372,7 +369,7 @@ $stmt->close();
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Make sure "New Payment" button works correctly
+    
     document.getElementById('newPaymentBtn')?.addEventListener('click', function() {
         document.getElementById('addPaymentModalLabel').textContent = 'Add New Payment';
     });

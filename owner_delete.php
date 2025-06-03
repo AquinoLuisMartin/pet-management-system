@@ -1,9 +1,9 @@
 <?php
-// filepath: c:\xampp\htdocs\pet-management-system\owner_delete.php
+
 include "includes/db_conn.php";
 session_start();
 
-// Check if the owner ID is provided
+
 if(!isset($_GET['id']) || empty($_GET['id'])) {
     $_SESSION['error_message'] = "Invalid owner ID";
     header("Location: owners.php");
@@ -13,7 +13,7 @@ if(!isset($_GET['id']) || empty($_GET['id'])) {
 $id = $_GET['id'];
 
 try {
-    // Use stored procedure to delete the owner
+    
     $stmt = $conn->prepare("CALL DeleteOwner(?)");
     $stmt->bind_param("i", $id);
     $result = $stmt->execute();

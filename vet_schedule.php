@@ -3,45 +3,41 @@ include "includes/db_conn.php";
 include "includes/header.php";
 session_start();
 
-// Get the vet ID from URL
+
 $vet_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
 if (!$vet_id) {
-    // Redirect if no valid vet ID
+    
     header("Location: veterinarians.php");
     exit;
 }
 
-// Fetch veterinarian information using stored procedure
+
 $stmt = $conn->prepare("CALL GetVeterinarianById(?)");
 $stmt->bind_param("i", $vet_id);
 $stmt->execute();
 $vet_result = $stmt->get_result();
 
 if ($vet_result->num_rows === 0) {
-    // Redirect if vet not found
+    
     header("Location: veterinarians.php");
     exit;
 }
 
 $vet = $vet_result->fetch_assoc();
 $stmt->close();
-$conn->next_result(); // Clear the result set
-
-// Get today's date for default filter
+$conn->next_result(); 
 $today = date('Y-m-d');
-
-// Get filtered date (default to today)
 $filter_date = isset($_GET['date']) ? $_GET['date'] : $today;
 
-// Get all appointments for this vet
+
 $stmt = $conn->prepare("CALL GetAllAppointments()");
 $stmt->execute();
 $all_appointments = $stmt->get_result();
 $stmt->close();
 $conn->next_result();
 
-// Filter appointments for this specific vet
+
 $appointments = array();
 while ($row = $all_appointments->fetch_assoc()) {
     if ($row['VetID'] == $vet_id) {
@@ -66,7 +62,7 @@ while ($row = $all_appointments->fetch_assoc()) {
         </div>
     </div>
 
-    <!-- Date Filter -->
+    
     <div class="card mb-4">
         <div class="card-body">
             <form method="get" class="row g-3 align-items-center">
@@ -87,7 +83,7 @@ while ($row = $all_appointments->fetch_assoc()) {
         </div>
     </div>
 
-    <!-- Appointments -->
+   
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="mb-0">Appointments</h5>
@@ -150,7 +146,7 @@ while ($row = $all_appointments->fetch_assoc()) {
     </div>
 </div>
 
-<!-- Status Update Modal -->
+
 <div class="modal fade" id="statusModal" tabindex="-1" aria-labelledby="statusModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -186,7 +182,7 @@ while ($row = $all_appointments->fetch_assoc()) {
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Status update button handler
+    
     document.querySelectorAll('.update-status').forEach(button => {
         button.addEventListener('click', function() {
             const petId = this.getAttribute('data-pet-id');
@@ -204,7 +200,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Function to determine badge color based on status
+
 function getStatusBadgeClass(status) {
     switch(status) {
         case 'Scheduled':
@@ -220,7 +216,7 @@ function getStatusBadgeClass(status) {
 </script>
 
 <?php
-// Helper function to get badge class
+
 function getStatusBadgeClass($status) {
     switch($status) {
         case 'Scheduled':

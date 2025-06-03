@@ -2,13 +2,13 @@
 include "includes/db_conn.php";
 include "includes/header.php";
 
-// Fetch all appointments for the calendar
+
 $stmt = $conn->prepare("CALL GetAllAppointmentsForCalendar()");
 $stmt->execute();
 $appointments_result = $stmt->get_result();
 $appointments = [];
 
-// Format appointments for the calendar
+
 while ($row = $appointments_result->fetch_assoc()) {
     $appointments[] = [
         'id' => $row['AppointmentID'],
@@ -26,7 +26,7 @@ while ($row = $appointments_result->fetch_assoc()) {
     ];
 }
 
-// Convert to JSON for JavaScript
+
 $appointments_json = json_encode($appointments);
 ?>
 
@@ -40,7 +40,7 @@ $appointments_json = json_encode($appointments);
 
     <div class="row">
         <div class="col-md-8">
-            <!-- Calendar will appear here -->
+           
             <div class="card mb-4">
                 <div class="card-body">
                     <div id="calendar"></div>
@@ -48,7 +48,7 @@ $appointments_json = json_encode($appointments);
             </div>
         </div>
         <div class="col-md-4">
-            <!-- Appointment details will appear here -->
+            
             <div class="card">
                 <div class="card-header">
                     <h5 class="card-title mb-0">Appointment Details</h5>
@@ -64,16 +64,16 @@ $appointments_json = json_encode($appointments);
     </div>
 </div>
 
-<!-- Add FullCalendar library -->
+
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.js"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Parse appointments data
+    
     const appointments = <?php echo $appointments_json; ?>;
     
-    // Initialize calendar
+    
     const calendarEl = document.getElementById('calendar');
     const calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
@@ -83,20 +83,20 @@ document.addEventListener('DOMContentLoaded', function() {
             right: 'dayGridMonth,timeGridWeek,timeGridDay'
         },
         events: appointments.map(appointment => {
-            // Set color based on status
+            
             let color;
             switch(appointment.status) {
                 case 'Completed':
-                    color = '#28a745'; // green
+                    color = '#28a745'; 
                     break;
                 case 'Scheduled':
-                    color = '#007bff'; // blue
+                    color = '#007bff'; 
                     break;
                 case 'Cancelled':
-                    color = '#dc3545'; // red
+                    color = '#dc3545'; 
                     break;
                 default:
-                    color = '#6c757d'; // gray
+                    color = '#6c757d';
             }
             
             return {
@@ -119,11 +119,11 @@ document.addEventListener('DOMContentLoaded', function() {
             };
         }),
         eventClick: function(info) {
-            // Show appointment details
+            
             displayAppointmentDetails(info.event);
         },
         dateClick: function(info) {
-            // Show all appointments for this day
+            
             const clickedDate = info.dateStr;
             const appointmentsForDay = appointments.filter(appointment => 
                 appointment.start.startsWith(clickedDate));
@@ -134,7 +134,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     calendar.render();
     
-    // Function to display appointment details
+    
     function displayAppointmentDetails(event) {
         const props = event.extendedProps;
         const statusClass = getStatusClass(props.status);
@@ -178,7 +178,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('appointment-details').innerHTML = detailsHtml;
     }
     
-    // Function to display all appointments for a specific day
+    
     function displayDayAppointments(date, dayAppointments) {
         if (dayAppointments.length === 0) {
             document.getElementById('appointment-details').innerHTML = `
@@ -216,7 +216,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('appointment-details').innerHTML = html;
     }
     
-    // Helper function to get Bootstrap status class
+    
     function getStatusClass(status) {
         switch (status) {
             case 'Completed':
@@ -230,7 +230,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Helper function to format date nicely
+    
     function formatDate(date) {
         return date.toLocaleDateString('en-US', { 
             weekday: 'long', 
@@ -240,7 +240,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Helper function to format time
+    
     function formatTime(datetime) {
         const time = datetime.split('T')[1];
         const date = new Date(`2000-01-01T${time}`);
@@ -251,7 +251,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Helper function to format date and time
+    
     function formatDateTime(date) {
         return date.toLocaleDateString('en-US', { 
             year: 'numeric', 
@@ -264,7 +264,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Expose function to global scope for list item clicks
+    
     window.showAppointmentDetails = function(appointmentId) {
         const appointment = appointments.find(a => a.id === appointmentId);
         if (appointment) {

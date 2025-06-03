@@ -2,16 +2,16 @@
 include "includes/db_conn.php";
 include "includes/header.php";
 
-// Initialize variables
+
 $clinic_name = 'ANICARE Veterinary Clinic';
 $clinic_address = '123 Pet Street, Petville';
 $clinic_phone = '(123) 456-7890';
 $clinic_email = 'info@anicare.com';
 $clinic_hours = '9:00 AM - 6:00 PM';
 
-// Check if form was submitted
+
 if (isset($_POST['save_settings'])) {
-    // Process the form submission (in a real app, you'd save these to a database)
+   
     $clinic_name = $_POST['clinic_name'];
     $clinic_address = $_POST['clinic_address'];
     $clinic_phone = $_POST['clinic_phone'];
@@ -38,7 +38,7 @@ if (isset($_POST['save_settings'])) {
     <?php endif; ?>
 
     <div class="row">
-        <!-- Settings Navigation -->
+       
         <div class="col-md-3">
             <div class="card mb-4">
                 <div class="card-body p-0">
@@ -53,10 +53,10 @@ if (isset($_POST['save_settings'])) {
             </div>
         </div>
         
-        <!-- Settings Content -->
+        
         <div class="col-md-9">
             <div class="tab-content">
-                <!-- Clinic Information Settings -->
+                
                 <div class="tab-pane fade show active" id="clinic">
                     <div class="card">
                         <div class="card-header">
@@ -98,7 +98,7 @@ if (isset($_POST['save_settings'])) {
                     </div>
                 </div>
                 
-                <!-- Other settings sections would go here -->
+                
                 <div class="tab-pane fade" id="users">
                     <div class="card">
                         <div class="card-header">
@@ -106,7 +106,7 @@ if (isset($_POST['save_settings'])) {
                         </div>
                         <div class="card-body">
                             <p class="text-muted">Manage system users and permissions.</p>
-                            <!-- User management form would go here -->
+                            
                             <div class="alert alert-info">User management feature is under development.</div>
                         </div>
                     </div>
@@ -119,7 +119,7 @@ if (isset($_POST['save_settings'])) {
                         </div>
                         <div class="card-body">
                             <p class="text-muted">Configure email templates for appointment reminders, etc.</p>
-                            <!-- Email template settings would go here -->
+                            
                             <div class="alert alert-info">Email template feature is under development.</div>
                         </div>
                     </div>
@@ -132,7 +132,7 @@ if (isset($_POST['save_settings'])) {
                         </div>
                         <div class="card-body">
                             <p class="text-muted">Backup your data or restore from a previous backup.</p>
-                            <!-- Backup buttons/forms would go here -->
+                            
                             <div class="alert alert-info">Backup feature is under development.</div>
                         </div>
                     </div>
@@ -145,7 +145,7 @@ if (isset($_POST['save_settings'])) {
                         </div>
                         <div class="card-body">
                             <p class="text-muted">Configure system-wide settings and preferences.</p>
-                            <!-- System settings would go here -->
+                           
                             <div class="alert alert-info">System settings feature is under development.</div>
                         </div>
                     </div>
@@ -157,7 +157,7 @@ if (isset($_POST['save_settings'])) {
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Bootstrap 5 list group tab functionality
+       
         var triggerTabList = [].slice.call(document.querySelectorAll('.list-group-item'))
         triggerTabList.forEach(function (triggerEl) {
             triggerEl.addEventListener('click', function (e) {
