@@ -9,13 +9,13 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     
-    <!-- Bootstrap -->
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
     
-    <!-- Font Awesome -->
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Custom CSS -->
+    
     <link rel="stylesheet" href="assets/css/style.css">
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -23,7 +23,7 @@
     <title>ANICARE - Veterinary Care System</title>
 </head>
 <body>
-    <!-- Sidebar -->
+    
     <div class="sidebar">
         <div class="sidebar-brand">
             <div class="logo-container">
@@ -35,7 +35,7 @@
             </div>
         </div>
         
-        <!-- Update these links to match your actual filenames -->
+        
         <div class="sidebar-menu">
             <a href="index.php" class="menu-item <?php echo basename($_SERVER['PHP_SELF']) == 'index.php' ? 'active' : ''; ?>">
                 <i class="fas fa-th-large"></i>
@@ -77,9 +77,9 @@
         </div>
     </div>
     
-    <!-- Main Content Area -->
+    
     <div class="main-content">
-        <!-- Top Bar -->
+       
         <div class="top-bar">
             <div class="search-container">
                 <input type="text" placeholder="Search Here">

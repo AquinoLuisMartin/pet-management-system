@@ -2,11 +2,11 @@
 session_start();
 include "includes/db_conn.php";
 
-// Check if form was submitted
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Check which form fields were provided
+    
     if (isset($_POST['petID']) && !empty($_POST['petID'])) {
-        // Use the directly provided petID (from dropdown)
+        
         $petID = (int)$_POST['petID'];
         $vetID = (int)$_POST['vetID'];
         $date = $_POST['date'];
@@ -15,12 +15,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $status = $_POST['status'];
         $notes = isset($_POST['notes']) ? mysqli_real_escape_string($conn, $_POST['notes']) : '';
         
-        // Now create the appointment using the CreateAppointment procedure
+        
         $stmt = $conn->prepare("CALL CreateAppointment(?, ?, ?, ?, ?, ?, ?)");
         $stmt->bind_param("iisssss", $petID, $vetID, $date, $time, $reason, $notes, $status);
     } 
     else if (isset($_POST['petName']) && isset($_POST['ownerName'])) {
-        // The existing flow for creating new pets when scheduled from elsewhere
+        
         $petName = mysqli_real_escape_string($conn, $_POST['petName']);
         $ownerName = mysqli_real_escape_string($conn, $_POST['ownerName']);
         $vetID = $_POST['vetID'];
@@ -30,7 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $status = $_POST['status'];
         $notes = isset($_POST['notes']) ? mysqli_real_escape_string($conn, $_POST['notes']) : '';
         
-        // First parse owner name
+        
         $owner_parts = explode(' ', $ownerName);
         $lastName = end($owner_parts);
         $firstName = reset($owner_parts);
@@ -42,15 +42,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->close();
         
         if ($pet_result->num_rows > 0) {
-            // Found the pet, use its ID
+           
             $petID = $pet_result->fetch_assoc()['PetID'];
         } else {
-            // Pet not found, create new owner first using existing RegisterOwner procedure
+            
             $conn->next_result();
-            $hashedPassword = password_hash(uniqid(), PASSWORD_DEFAULT); // Generate random password
-            $email = strtolower($firstName . '.' . $lastName . '@example.com'); // Generate email
-            $phone = ''; // Empty phone
-            $address = ''; // Empty address
+            $hashedPassword = password_hash(uniqid(), PASSWORD_DEFAULT); 
+            $email = strtolower($firstName . '.' . $lastName . '@example.com'); 
+            $phone = ''; 
+            $address = ''; 
             
             $stmt = $conn->prepare("CALL RegisterOwner(?, ?, ?, ?, ?, ?)");
             $stmt->bind_param("ssssss", $firstName, $lastName, $phone, $email, $address, $hashedPassword);
@@ -60,11 +60,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $ownerID = $owner['OwnerID'];
             $stmt->close();
             
-            // Then create pet using CreatePet procedure
+            
             $conn->next_result();
-            $species = ''; // Default empty values
+            $species = ''; 
             $breed = '';
-            $dob = date('Y-m-d'); // Today's date as default
+            $dob = date('Y-m-d'); 
             $gender = '';
             $weight = 0.0;
             $medicalConditions = '';
@@ -78,13 +78,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmt->close();
         }
         
-        // Now create the appointment using the CreateAppointment procedure
+       
         $conn->next_result();
         $stmt = $conn->prepare("CALL CreateAppointment(?, ?, ?, ?, ?, ?, ?)");
         $stmt->bind_param("iisssss", $petID, $vetID, $date, $time, $reason, $notes, $status);
     } 
     else {
-        // No valid pet identification provided
+        
         header("Location: appointment.php?error=No pet selected");
         exit();
     }
@@ -99,9 +99,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->close();
 }
 
-// Handle appointment edit
+
 if (isset($_POST['edit'])) {
-    // Get data from form
+    
     $oldPetID = $_POST['oldPetID'];
     $oldVetID = $_POST['oldVetID'];
     $oldDate = $_POST['oldDate'];
@@ -131,7 +131,7 @@ if (isset($_POST['edit'])) {
     $stmt->close();
 }
 
-// Handle appointment delete
+
 if (isset($_GET['action']) && $_GET['action'] == 'delete') {
     $id = $_GET['id'];
     $parts = explode('-', $id);
@@ -159,22 +159,22 @@ if (isset($_GET['action']) && $_GET['action'] == 'delete') {
     }
 }
 
-// Handle GET request for fetching appointment data
+
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action']) && $_GET['action'] === 'get' && isset($_GET['id'])) {
     $appointment_id = intval($_GET['id']);
     
-    // Prepare and execute the query to get appointment details
+    
     $stmt = $conn->prepare("CALL GetAppointmentById(?)");
     $stmt->bind_param("i", $appointment_id);
     $stmt->execute();
     $result = $stmt->get_result();
     
     if ($row = $result->fetch_assoc()) {
-        // Return the appointment data as JSON
+        
         header('Content-Type: application/json');
         echo json_encode($row);
     } else {
-        // Return an error
+       
         http_response_code(404);
         echo json_encode(['error' => 'Appointment not found']);
     }
@@ -184,10 +184,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action']) && $_GET['act
     exit;
 }
 
-// Handle POST requests for create, update, delete
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     
-    // Create a new appointment
+    
     if ($_POST['action'] === 'create') {
         $pet_id = intval($_POST['petID']);
         $vet_id = intval($_POST['vetID']);
@@ -197,7 +197,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $notes = $_POST['notes'] ?? '';
         $status = $_POST['status'];
         
-        // Prepare and execute the create query
+        
         $stmt = $conn->prepare("CALL CreateAppointment(?, ?, ?, ?, ?, ?, ?)");
         $stmt->bind_param("iisssss", $pet_id, $vet_id, $date, $time, $reason, $notes, $status);
         
@@ -210,7 +210,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $stmt->close();
     }
     
-    // Update an existing appointment
+    
     else if ($_POST['action'] === 'update' && isset($_POST['appointmentID'])) {
         $appointment_id = intval($_POST['appointmentID']);
         $pet_id = intval($_POST['petID']);
@@ -221,7 +221,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $notes = $_POST['notes'] ?? '';
         $status = $_POST['status'];
         
-        // Prepare and execute the update query
+        
         $stmt = $conn->prepare("CALL UpdateAppointment(?, ?, ?, ?, ?, ?, ?, ?)");
         $stmt->bind_param("iiisssss", $appointment_id, $pet_id, $vet_id, $date, $time, $reason, $notes, $status);
         
@@ -234,11 +234,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $stmt->close();
     }
     
-    // Delete an appointment
+    
     else if ($_POST['action'] === 'delete' && isset($_POST['appointmentID'])) {
         $appointment_id = intval($_POST['appointmentID']);
         
-        // Prepare and execute the delete query
+        
         $stmt = $conn->prepare("CALL DeleteAppointment(?)");
         $stmt->bind_param("i", $appointment_id);
         
@@ -255,7 +255,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     exit;
 }
 
-// Handle appointment status update
+
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['action'] == 'update_status') {
     $petID = (int)$_POST['petID'];
     $vetID = (int)$_POST['vetID'];
@@ -263,15 +263,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
     $time = $_POST['time'];
     $status = $_POST['status'];
     
-    // Call the UpdateAppointmentStatus stored procedure
+    
     $stmt = $conn->prepare("CALL UpdateAppointmentStatus(?, ?, ?, ?, ?)");
     $stmt->bind_param("iisss", $petID, $vetID, $date, $time, $status);
     
     if ($stmt->execute()) {
-        // Redirect back to the referring page with success message
+        
         header("Location: " . $_SERVER['HTTP_REFERER'] . "&success=Status updated successfully");
     } else {
-        // Redirect back with error message
+        
         header("Location: " . $_SERVER['HTTP_REFERER'] . "&error=Failed to update status: " . $conn->error);
     }
     
@@ -279,7 +279,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
     exit;
 }
 
-// Redirect back if no action was taken
+
 header("Location: appointment.php");
 exit();
 ?>

@@ -1,15 +1,10 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-/**
- * Pet Management System - Animation and UI Enhancement Script
- * This script handles animations, transitions, and interactive elements across the application.
- */
+
 
 $(document).ready(function() {
     
-    // ===== FORM ANIMATIONS =====
     
-    // Input field effects
     $('input, textarea, select').on('focus', function() {
         $(this).closest('.form-group').addClass('focused');
     }).on('blur', function() {
@@ -18,14 +13,14 @@ $(document).ready(function() {
         }
     });
     
-    // Pre-fill effect for inputs with values
+   
     $('input, textarea, select').each(function() {
         if ($(this).val()) {
             $(this).closest('.form-group').addClass('focused');
         }
     });
     
-    // Form submission animation
+   
     $('form').on('submit', function() {
         const form = $(this);
         if (!form.hasClass('no-animation') && !form.is('#searchForm')) {
@@ -35,7 +30,7 @@ $(document).ready(function() {
             submitBtn.prop('disabled', true)
                 .html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...');
             
-            // Re-enable after 3 seconds if form doesn't redirect
+            
             setTimeout(function() {
                 if (submitBtn.prop('disabled')) {
                     submitBtn.prop('disabled', false).html(originalText);
@@ -44,7 +39,7 @@ $(document).ready(function() {
         }
     });
     
-    // Login/Signup form toggle animation
+    
     $('#toggleSignup, #toggleLogin').on('click', function(e) {
         e.preventDefault();
         
@@ -56,12 +51,12 @@ $(document).ready(function() {
             targetForm.fadeIn(300);
         });
         
-        // Update page title
+       
         const title = isSignup ? 'Sign Up' : 'Login';
         $('#authTitle').text(title);
     });
     
-    // Password visibility toggle
+    
     $('.password-toggle').on('click', function() {
         const input = $(this).siblings('input');
         const icon = $(this).find('i');
@@ -75,7 +70,7 @@ $(document).ready(function() {
         }
     });
     
-    // Shake animation for login errors
+    
     if ($('.login-error').length) {
         $('#loginForm').addClass('shake-animation');
         setTimeout(function() {
@@ -83,24 +78,22 @@ $(document).ready(function() {
         }, 500);
     }
     
-    // ===== BUTTON ANIMATIONS =====
     
-    // Standard button hover effect
     $('.btn').not('.btn-link, .no-animation').hover(
         function() { $(this).addClass('btn-pulse'); },
         function() { $(this).removeClass('btn-pulse'); }
     );
     
-    // Action button click ripple effect
+   
     $('.btn-primary, .btn-success, .btn-danger').on('mousedown', function(e) {
         const button = $(this);
         
-        // Create ripple element
+       
         const ripple = $('<span class="ripple-effect"></span>');
         const size = Math.max(button.outerWidth(), button.outerHeight());
         const pos = button.offset();
         
-        // Set ripple position and size
+        
         ripple.css({
             width: size + 'px',
             height: size + 'px',
@@ -108,37 +101,37 @@ $(document).ready(function() {
             left: (e.pageX - pos.left - size/2) + 'px'
         }).appendTo(button);
         
-        // Remove after animation completes
+        
         setTimeout(function() {
             ripple.remove();
         }, 500);
     });
     
-    // CRUD operation buttons (Add/Edit/Delete)
+   
     $('.add-btn').on('click', function() {
         $(this).addClass('scale-animation');
         setTimeout(() => $(this).removeClass('scale-animation'), 300);
     });
     
-    // View button animation
+    
     $('.view-btn').hover(
         function() { $(this).find('i').addClass('fa-beat-fade'); },
         function() { $(this).find('i').removeClass('fa-beat-fade'); }
     );
     
-    // Edit button animation
+   
     $('.edit-btn').hover(
         function() { $(this).find('i').addClass('fa-bounce'); },
         function() { $(this).find('i').removeClass('fa-bounce'); }
     );
     
-    // Delete button animation
+    
     $('.delete-btn').hover(
         function() { $(this).find('i').addClass('fa-shake'); },
         function() { $(this).find('i').removeClass('fa-shake'); }
     );
     
-    // Action confirmation for delete buttons
+    
     $('.delete-btn').on('click', function(e) {
         const button = $(this);
         
@@ -146,11 +139,11 @@ $(document).ready(function() {
             e.preventDefault();
             e.stopPropagation();
             
-            // First click: change to confirmation state
+            
             button.addClass('confirm-active btn-danger').removeClass('btn-outline-danger');
             button.find('i').removeClass('fa-trash').addClass('fa-exclamation-triangle');
             
-            // Reset after delay if not clicked
+            
             setTimeout(function() {
                 if (button.hasClass('confirm-active')) {
                     button.removeClass('confirm-active btn-danger').addClass('btn-outline-danger');
@@ -160,9 +153,7 @@ $(document).ready(function() {
         }
     });
     
-    // ===== MODAL ANIMATIONS =====
-    
-    // Enhanced modal animations
+  
     $('.modal').on('show.bs.modal', function() {
         $(this).find('.modal-dialog').removeClass('fade-out-down').addClass('fade-in-down');
     });
@@ -171,16 +162,14 @@ $(document).ready(function() {
         $(this).find('.modal-dialog').removeClass('fade-in-down').addClass('fade-out-down');
     });
     
-    // ===== NAVIGATION ANIMATIONS =====
-    
-    // Active link highlight effect
+   
     $('.nav-link').each(function() {
         if (window.location.pathname.indexOf($(this).attr('href')) > -1) {
             $(this).addClass('active-link');
         }
     });
     
-    // Navigation hover effect
+    
     $('.nav-item').hover(
         function() {
             if (!$(this).find('.nav-link').hasClass('active-link')) {
@@ -192,21 +181,19 @@ $(document).ready(function() {
         }
     );
     
-    // ===== TABLE & CARD ANIMATIONS =====
     
-    // Row hover effect
     $('tbody tr').hover(
         function() { $(this).addClass('row-highlight'); },
         function() { $(this).removeClass('row-highlight'); }
     );
     
-    // Card hover effect
+    
     $('.card').not('.no-animation').hover(
         function() { $(this).addClass('card-lift'); },
         function() { $(this).removeClass('card-lift'); }
     );
     
-    // Data refresh spinner
+   
     $('.refresh-btn').on('click', function() {
         const btn = $(this);
         btn.addClass('fa-spin');
@@ -216,19 +203,15 @@ $(document).ready(function() {
         }, 1000);
     });
     
-    // ===== ALERT ANIMATIONS =====
     
-    // Custom alert animations
     $('.alert').addClass('fade-in-down');
     
-    // Auto-dismiss alerts after 5 seconds
+    
     setTimeout(function() {
         $('.alert').not('.alert-permanent').alert('close');
     }, 5000);
     
-    // ===== DASHBOARD WIDGETS =====
     
-    // Animate counters
     $('.counter-number').each(function() {
         const $this = $(this);
         const target = parseInt($this.text(), 10);
@@ -245,9 +228,7 @@ $(document).ready(function() {
         });
     });
     
-    // ===== UTILITY FUNCTIONS =====
     
-    // Flash message function
     window.flashMessage = function(message, type = 'success') {
         const alertHtml = `
             <div class="alert alert-${type} alert-dismissible fade show fade-in-down" role="alert">
@@ -256,14 +237,13 @@ $(document).ready(function() {
             </div>
         `;
         
-        // Add to page and set to auto-dismiss
         const alert = $(alertHtml).prependTo('.container:first');
         setTimeout(function() {
             alert.alert('close');
         }, 5000);
     };
     
-    // Loading overlay
+    
     window.showLoading = function() {
         $('body').append('<div class="loading-overlay"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>');
         $('.loading-overlay').fadeIn(300);
@@ -275,7 +255,7 @@ $(document).ready(function() {
         });
     };
     
-    // Confirm dialog with animation
+   
     window.animatedConfirm = function(message, callback) {
         const dialogHtml = `
             <div class="confirm-dialog-overlay">
@@ -311,7 +291,7 @@ $(document).ready(function() {
     };
 });
 
-// Add required CSS for animations
+
 document.addEventListener('DOMContentLoaded', function() {
     const style = document.createElement('style');
     style.textContent = `

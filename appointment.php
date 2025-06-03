@@ -2,39 +2,39 @@
 include "includes/db_conn.php";
 include "includes/header.php";
 
-// Get appointment data using stored procedure
+
 $stmt = $conn->prepare("CALL GetAllAppointments()");
 $stmt->execute();
 $result = $stmt->get_result();
 $stmt->close();
 
-// Get all pets for dropdown using stored procedure
-$conn->next_result(); // Clear previous result set
+
+$conn->next_result(); 
 $stmt = $conn->prepare("CALL GetPetsWithOwners()");
 $stmt->execute();
 $pets_result = $stmt->get_result();
 $stmt->close();
 
-// Get vets for dropdown using stored procedure
-$conn->next_result(); // Clear previous result set
+
+$conn->next_result(); 
 $stmt = $conn->prepare("CALL GetAllVetsForDropdown()");
 $stmt->execute();
 $vets_result = $stmt->get_result();
 $stmt->close();
 
-// Get owners for dropdown using stored procedure
-$conn->next_result(); // Clear previous result set
+
+$conn->next_result(); 
 $stmt = $conn->prepare("CALL GetOwnersForDropdown()");
 $stmt->execute();
 $owners_result = $stmt->get_result();
 $stmt->close();
 
-// Get current logged in owner ID if available
+
 $owner_id = $_SESSION['owner_id'] ?? null;
 $current_owner_name = '';
 
 if ($owner_id) {
-    $conn->next_result(); // Clear previous result set
+    $conn->next_result(); 
     $stmt = $conn->prepare("CALL GetOwnerById(?)");
     $stmt->bind_param("i", $owner_id);
     $stmt->execute();
@@ -44,8 +44,8 @@ if ($owner_id) {
     }
     $stmt->close();
     
-    // Get pets for this owner only
-    $conn->next_result(); // Clear previous result set
+    
+    $conn->next_result(); 
     $stmt = $conn->prepare("CALL GetPetsByOwnerID(?)");
     $stmt->bind_param("i", $owner_id);
     $stmt->execute();
@@ -70,7 +70,7 @@ if ($owner_id) {
         </div>
     </div>
 
-    <!-- Display success/error messages -->
+    
     <?php
     if (isset($_GET['success'])) {
         echo '<div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -86,7 +86,7 @@ if ($owner_id) {
     }
     ?>
 
-    <!-- Filter/Search Section -->
+    
     <div class="card mb-4">
         <div class="card-body">
             <form class="row g-3">
@@ -111,7 +111,7 @@ if ($owner_id) {
         </div>
     </div>
 
-    <!-- Appointments Table -->
+    
     <div class="card">
         <div class="card-body">
             <div class="table-responsive">
@@ -172,7 +172,7 @@ if ($owner_id) {
     </div>
 </div>
 
-<!-- Add Appointment Modal -->
+
 <div class="modal fade" id="addAppointmentModal" tabindex="-1" role="dialog" aria-labelledby="addAppointmentModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -181,11 +181,11 @@ if ($owner_id) {
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <!-- Update the form fields in the Add New Appointment Modal -->
+               
                 <form id="appointmentForm" action="appointment_process.php" method="post">
                     <input type="hidden" name="action" value="create">
                     <?php if ($owner_id): ?>
-                        <!-- If owner is logged in, only show their pets -->
+                        
                         <div class="form-group mb-3">
                             <label for="petID" class="form-label">Select Your Pet</label>
                             <select class="form-control" id="petID" name="petID" required>
@@ -197,16 +197,16 @@ if ($owner_id) {
                             </select>
                         </div>
                         
-                        <!-- Hidden field for owner -->
+                        
                         <input type="hidden" name="ownerID" value="<?= $owner_id ?>">
                         
-                        <!-- Display owner name as non-editable -->
+                        
                         <div class="form-group mb-3">
                             <label for="ownerDisplay" class="form-label">Owner</label>
                             <input type="text" class="form-control" id="ownerDisplay" value="<?= htmlspecialchars($current_owner_name) ?>" readonly>
                         </div>
                     <?php else: ?>
-                        <!-- If not logged in as owner, show selection form -->
+                        
                         <div class="form-group mb-3">
                             
                             <select class="form-control" id="petID" name="petID" required>
@@ -220,14 +220,14 @@ if ($owner_id) {
                                 <?php endwhile; ?>
                             </select>
                         </div>
-                        <!-- Display calculated owner name -->
+                        
                         <div class="form-group mb-3">
         
                             <input type="text" class="form-control" id="ownerDisplay" readonly>
                         </div>
                     <?php endif; ?>
                     
-                    <!-- Veterinarian Selection -->
+                    
                     <div class="form-group mb-3">
                         
                         <select class="form-control" id="vetID" name="vetID" required>
@@ -243,7 +243,7 @@ if ($owner_id) {
                         </select>
                     </div>
                     
-                    <!-- Date and Time -->
+                    
                     <div class="form-group mb-3">
                         
                         <input type="date" class="form-control" id="date" name="date" required>
@@ -282,7 +282,7 @@ if ($owner_id) {
     </div>
 </div>
 
-<!-- Edit Appointment Modal -->
+
 <div class="modal fade" id="editAppointmentModal" tabindex="-1" role="dialog" aria-labelledby="editAppointmentModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -295,13 +295,13 @@ if ($owner_id) {
                     <input type="hidden" name="action" value="update">
                     <input type="hidden" name="appointmentID" id="edit_appointmentID">
                     
-                    <!-- Pet Selection -->
+                    
                     <div class="form-group mb-3">
                         <label for="edit_petID">Pet</label>
                         <select class="form-control" id="edit_petID" name="petID" required>
                             <option value="">Select a pet</option>
                             <?php 
-                            // Reset the pets result pointer
+                            
                             mysqli_data_seek($pets_result, 0);
                             while ($pet = mysqli_fetch_assoc($pets_result)):
                             ?>
@@ -312,19 +312,19 @@ if ($owner_id) {
                         </select>
                     </div>
                     
-                    <!-- Display owner name -->
+                    
                     <div class="form-group mb-3">
                         <label>Owner Name</label>
                         <input type="text" class="form-control" id="edit_ownerDisplay" readonly>
                     </div>
                     
-                    <!-- Veterinarian Selection -->
+                    
                     <div class="form-group mb-3">
                         <label for="edit_vetID">Veterinarian</label>
                         <select class="form-control" id="edit_vetID" name="vetID" required>
                             <option value="">Select a veterinarian</option>
                             <?php 
-                            // Reset the vets result pointer
+                            
                             mysqli_data_seek($vets_result, 0);
                             while ($vet = mysqli_fetch_assoc($vets_result)):
                             ?>
@@ -335,7 +335,7 @@ if ($owner_id) {
                         </select>
                     </div>
                     
-                    <!-- Date and Time -->
+                    
                     <div class="form-group mb-3">
                         <label for="edit_date">Date</label>
                         <input type="date" class="form-control" id="edit_date" name="date" required>
@@ -374,7 +374,7 @@ if ($owner_id) {
     </div>
 </div>
 
-<!-- Delete Confirmation Modal -->
+
 <div class="modal fade" id="deleteAppointmentModal" tabindex="-1" aria-labelledby="deleteAppointmentModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -400,7 +400,7 @@ if ($owner_id) {
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Auto-populate owner name when pet is selected
+    
     const petSelect = document.getElementById('petID');
     if (petSelect) {
         petSelect.addEventListener('change', function() {
@@ -417,7 +417,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Search and filter functionality
+    
     $("#searchFilter").on("keyup", function() {
         var value = $(this).val().toLowerCase();
         $("table tbody tr").filter(function() {
@@ -425,7 +425,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Status filter
+    
     $("#statusFilter").on("change", function() {
         var value = $(this).val().toLowerCase();
         if (value === "") {
@@ -437,7 +437,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Date filter
+    
     $("#dateFilter").on("change", function() {
         var value = $(this).val();
         if (value === "") {

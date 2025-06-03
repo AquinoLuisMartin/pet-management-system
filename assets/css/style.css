@@ -34,7 +34,6 @@ a {
   color: inherit;
 }
 
-/* Sidebar Styles */
 .sidebar {
   width: var(--sidebar-width);
   background-color: var(--white);
@@ -116,14 +115,12 @@ a {
   font-size: 18px;
 }
 
-/* Main Content Styles */
 .main-content {
   margin-left: var(--sidebar-width);
   flex: 1;
   padding: 20px 30px;
 }
 
-/* Top Bar Styles */
 .top-bar {
   display: flex;
   justify-content: space-between;
@@ -181,7 +178,6 @@ a {
   background-color: var(--danger);
 }
 
-/* Hero Section */
 .hero-section {
   background-color: var(--primary-color);
   color: var(--white);
@@ -224,7 +220,6 @@ a {
   transition: all 0.3s ease;
 }
 
-/* Features Section */
 .section-header {
   display: flex;
   justify-content: space-between;
@@ -288,7 +283,6 @@ a {
   font-size: 18px;
 }
 
-/* Schedule Section */
 .schedule-container {
   position: fixed;
   right: 30px;
@@ -390,7 +384,6 @@ a {
   margin: 0;
 }
 
-/* Responsive Design */
 @media (max-width: 1200px) {
   :root {
     --sidebar-width: 80px;
@@ -462,7 +455,6 @@ a {
   }
 }
 
-/* ===== ANIMATION KEYFRAMES ===== */
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
@@ -520,7 +512,6 @@ a {
     60% { transform: translateY(-5px); }
 }
 
-/* ===== ANIMATION CLASSES ===== */
 .fade-in { animation: fadeIn 0.5s ease forwards; }
 .fade-in-down { animation: fadeInDown 0.5s ease forwards; }
 .fade-in-up { animation: fadeInUp 0.5s ease forwards; }
@@ -531,7 +522,6 @@ a {
 .shake-animation { animation: shake 0.5s ease-in-out; }
 .bounce { animation: bounce 1s ease; }
 
-/* Staggered animations for multiple elements */
 .stagger-item:nth-child(1) { animation-delay: 0.1s; }
 .stagger-item:nth-child(2) { animation-delay: 0.2s; }
 .stagger-item:nth-child(3) { animation-delay: 0.3s; }
@@ -541,7 +531,6 @@ a {
 .stagger-item:nth-child(7) { animation-delay: 0.7s; }
 .stagger-item:nth-child(8) { animation-delay: 0.8s; }
 
-/* ===== LOGIN/SIGNUP ANIMATIONS ===== */
 .auth-container {
     opacity: 0;
     animation: fadeInDown 0.8s ease forwards;
@@ -582,7 +571,6 @@ a {
     animation: shake 0.5s ease-in-out;
 }
 
-/* Login/signup form focus effects */
 .form-group {
     position: relative;
     margin-bottom: 1.5rem;
@@ -615,7 +603,6 @@ a {
     box-shadow: 0 0 0 0.2rem rgba(30, 136, 229, 0.25);
 }
 
-/* Password visibility toggle */
 .password-toggle {
     position: absolute;
     right: 10px;
@@ -631,7 +618,6 @@ a {
     color: var(--text-light);
 }
 
-/* ===== BUTTON ANIMATIONS ===== */
 .btn {
     position: relative;
     overflow: hidden;
@@ -648,7 +634,6 @@ a {
     transform: translateY(1px);
 }
 
-/* Ripple effect for buttons */
 .ripple-effect {
     position: absolute;
     border-radius: 50%;
@@ -658,12 +643,10 @@ a {
     pointer-events: none;
 }
 
-/* Button highlight effects for actions */
 .btn-primary:hover, .btn-success:hover, .btn-danger:hover {
     filter: brightness(110%);
 }
 
-/* CRUD button hover animations */
 .view-btn:hover i {
     animation: none;
 }
@@ -680,7 +663,6 @@ a {
     animation: none;
 }
 
-/* ===== CARD & ELEMENT ANIMATIONS ===== */
 .card {
     transition: all 0.3s ease;
 }
@@ -703,7 +685,6 @@ a {
     animation: none;
 }
 
-/* Dashboard stat cards */
 .stat-card {
     transition: all 0.3s ease;
 }
@@ -713,7 +694,6 @@ a {
     box-shadow: var(--card-shadow);
 }
 
-/* ===== TABLE ANIMATIONS ===== */
 .table tbody tr {
     transition: all 0.2s ease;
 }
@@ -723,12 +703,10 @@ a {
     transform: none;
 }
 
-/* Row highlighting */
 .row-highlight {
     background-color: rgba(30, 136, 229, 0.05);
 }
 
-/* ===== MODAL ANIMATIONS ===== */
 .modal-dialog {
     opacity: 0;
     transform: translateY(-20px);
@@ -744,7 +722,6 @@ a {
     box-shadow: 0 15px 35px rgba(50,50,93,.1), 0 5px 15px rgba(0,0,0,.07);
 }
 
-/* ===== ALERT & NOTIFICATION ANIMATIONS ===== */
 .alert {
     opacity: 0;
     animation: fadeInDown 0.5s ease forwards;
@@ -755,7 +732,6 @@ a {
     transition: all 0.3s ease;
 }
 
-/* Notification bell animation */
 .notification-bell:hover i {
     animation: none;
 }
@@ -764,7 +740,6 @@ a {
     animation: pulse 2s infinite;
 }
 
-/* ===== SIDEBAR ANIMATIONS ===== */
 .sidebar {
     transition: transform 0.3s ease, width 0.3s ease;
 }
@@ -789,7 +764,6 @@ a {
     animation: fadeIn 0.3s ease forwards;
 }
 
-/* ===== LOADING ANIMATIONS ===== */
 .loading-overlay {
     position: fixed;
     top: 0;
@@ -818,8 +792,6 @@ a {
     100% { transform: rotate(360deg); }
 }
 
-/* ===== APPOINTMENT CALENDAR ANIMATIONS ===== */
-/* Your existing calendar styles plus animations */
 .fc-daygrid-day.fc-day-has-event {
     background-color: rgba(30, 136, 229, 0.15);
     transition: all 0.3s ease;
@@ -849,12 +821,10 @@ a {
     box-shadow: none;
 }
 
-/* Animation for day hover */
 .fc-day:hover {
     background-color: transparent;
 }
 
-/* Make calendar responsive */
 @media (max-width: 768px) {
     .fc .fc-toolbar {
         display: block;
@@ -866,8 +836,6 @@ a {
         margin-bottom: 10px;
     }
 }
-
-/* Payment page specific styles */
 
 .badge {
     padding: 0.5em 0.75em;
@@ -892,7 +860,6 @@ a {
     color: #212529;
 }
 
-/* Summary cards hover effect */
 .card.bg-success,
 .card.bg-warning,
 .card.bg-info {
@@ -906,7 +873,6 @@ a {
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
 }
 
-/* Receipt button style */
 .receipt-btn {
     color: #17a2b8;
     border-color: #17a2b8;
@@ -918,7 +884,6 @@ a {
     border-color: #17a2b8;
 }
 
-/* Logout button styling */
 .dropdown-item.logout-btn {
     color: #dc3545;
 }
@@ -928,9 +893,8 @@ a {
     color: white;
 }
 
-/* For standalone logout button */
 .menu-item.logout-btn {
-    margin-top: auto; /* Push to bottom of sidebar */
+    margin-top: auto;
     color: #dc3545;
 }
 
@@ -939,7 +903,6 @@ a {
     color: white;
 }
 
-/* Add to your CSS file */
 .hero-section .btn-danger {
     background-color: #dc3545;
     border-color: #dc3545;

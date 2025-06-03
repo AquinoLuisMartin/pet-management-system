@@ -11,7 +11,7 @@ if (isset($_POST["submit"])) {
     $conditions = $_POST['conditions'];
     $ownerID = $_POST['ownerID'];
 
-    // Use stored procedure instead of direct SQL
+    
     $stmt = $conn->prepare("CALL AddNewPet(?, ?, ?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("sssssdsi", $name, $species, $breed, $dob, $gender, $weight, $conditions, $ownerID);
     $result = $stmt->execute();
