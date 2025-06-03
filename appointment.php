@@ -181,14 +181,14 @@ if ($owner_id) {
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
+                <!-- Update the form fields in the Add New Appointment Modal -->
                 <form id="appointmentForm" action="appointment_process.php" method="post">
                     <input type="hidden" name="action" value="create">
                     <?php if ($owner_id): ?>
                         <!-- If owner is logged in, only show their pets -->
                         <div class="form-group mb-3">
-                            <label for="petID">Select Your Pet</label>
+                            <label for="petID" class="form-label">Select Your Pet</label>
                             <select class="form-control" id="petID" name="petID" required>
-                                <option value="">Select a pet</option>
                                 <?php 
                                 while ($pet = mysqli_fetch_assoc($owner_pets_result)):
                                 ?>
@@ -202,15 +202,15 @@ if ($owner_id) {
                         
                         <!-- Display owner name as non-editable -->
                         <div class="form-group mb-3">
-                            <label>Owner</label>
-                            <input type="text" class="form-control" value="<?= htmlspecialchars($current_owner_name) ?>" readonly>
+                            <label for="ownerDisplay" class="form-label">Owner</label>
+                            <input type="text" class="form-control" id="ownerDisplay" value="<?= htmlspecialchars($current_owner_name) ?>" readonly>
                         </div>
                     <?php else: ?>
                         <!-- If not logged in as owner, show selection form -->
                         <div class="form-group mb-3">
-                            <label for="petID">Select Pet</label>
+                            
                             <select class="form-control" id="petID" name="petID" required>
-                                <option value="">Select a pet</option>
+                                <option value="">-- Select a pet --</option>
                                 <?php 
                                 while ($pet = mysqli_fetch_assoc($pets_result)):
                                 ?>
@@ -222,17 +222,18 @@ if ($owner_id) {
                         </div>
                         <!-- Display calculated owner name -->
                         <div class="form-group mb-3">
-                            <label>Owner Name</label>
+        
                             <input type="text" class="form-control" id="ownerDisplay" readonly>
                         </div>
                     <?php endif; ?>
                     
                     <!-- Veterinarian Selection -->
                     <div class="form-group mb-3">
-                        <label for="vetID">Veterinarian</label>
+                        
                         <select class="form-control" id="vetID" name="vetID" required>
-                            <option value="">Select a veterinarian</option>
+                            <option value="">-- Select a veterinarian --</option>
                             <?php 
+                            mysqli_data_seek($vets_result, 0);
                             while ($vet = mysqli_fetch_assoc($vets_result)):
                             ?>
                             <option value="<?= $vet['VetID'] ?>">
@@ -244,27 +245,27 @@ if ($owner_id) {
                     
                     <!-- Date and Time -->
                     <div class="form-group mb-3">
-                        <label for="date">Date</label>
+                        
                         <input type="date" class="form-control" id="date" name="date" required>
                     </div>
                     
                     <div class="form-group mb-3">
-                        <label for="time">Time</label>
+                        
                         <input type="time" class="form-control" id="time" name="time" required>
                     </div>
                     
                     <div class="form-group mb-3">
-                        <label for="reason">Reason</label>
+                        <label for="reason" class="form-label">Reason</label>
                         <textarea class="form-control" id="reason" name="reason" rows="3" required></textarea>
                     </div>
                     
                     <div class="form-group mb-3">
-                        <label for="notes">Additional Notes</label>
+                        <label for="notes" class="form-label">Additional Notes</label>
                         <textarea class="form-control" id="notes" name="notes" rows="2"></textarea>
                     </div>
                     
                     <div class="form-group mb-3">
-                        <label for="status">Status</label>
+                        <label for="status" class="form-label">Status</label>
                         <select class="form-control" id="status" name="status">
                             <option value="Scheduled">Scheduled</option>
                             <option value="Completed">Completed</option>
@@ -276,6 +277,122 @@ if ($owner_id) {
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <button type="submit" form="appointmentForm" class="btn btn-primary">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Appointment Modal -->
+<div class="modal fade" id="editAppointmentModal" tabindex="-1" role="dialog" aria-labelledby="editAppointmentModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editAppointmentModalLabel">Edit Appointment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editAppointmentForm" action="appointment_process.php" method="post">
+                    <input type="hidden" name="action" value="update">
+                    <input type="hidden" name="appointmentID" id="edit_appointmentID">
+                    
+                    <!-- Pet Selection -->
+                    <div class="form-group mb-3">
+                        <label for="edit_petID">Pet</label>
+                        <select class="form-control" id="edit_petID" name="petID" required>
+                            <option value="">Select a pet</option>
+                            <?php 
+                            // Reset the pets result pointer
+                            mysqli_data_seek($pets_result, 0);
+                            while ($pet = mysqli_fetch_assoc($pets_result)):
+                            ?>
+                            <option value="<?= $pet['PetID'] ?>" data-owner="<?= htmlspecialchars($pet['OwnerName']) ?>">
+                                <?= htmlspecialchars($pet['PetName']) ?> (<?= htmlspecialchars($pet['OwnerName']) ?>)
+                            </option>
+                            <?php endwhile; ?>
+                        </select>
+                    </div>
+                    
+                    <!-- Display owner name -->
+                    <div class="form-group mb-3">
+                        <label>Owner Name</label>
+                        <input type="text" class="form-control" id="edit_ownerDisplay" readonly>
+                    </div>
+                    
+                    <!-- Veterinarian Selection -->
+                    <div class="form-group mb-3">
+                        <label for="edit_vetID">Veterinarian</label>
+                        <select class="form-control" id="edit_vetID" name="vetID" required>
+                            <option value="">Select a veterinarian</option>
+                            <?php 
+                            // Reset the vets result pointer
+                            mysqli_data_seek($vets_result, 0);
+                            while ($vet = mysqli_fetch_assoc($vets_result)):
+                            ?>
+                            <option value="<?= $vet['VetID'] ?>">
+                                Dr. <?= htmlspecialchars($vet['VetName']) ?> (<?= htmlspecialchars($vet['Specialization']) ?>)
+                            </option>
+                            <?php endwhile; ?>
+                        </select>
+                    </div>
+                    
+                    <!-- Date and Time -->
+                    <div class="form-group mb-3">
+                        <label for="edit_date">Date</label>
+                        <input type="date" class="form-control" id="edit_date" name="date" required>
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <label for="edit_time">Time</label>
+                        <input type="time" class="form-control" id="edit_time" name="time" required>
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <label for="edit_reason">Reason</label>
+                        <textarea class="form-control" id="edit_reason" name="reason" rows="3" required></textarea>
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <label for="edit_notes">Additional Notes</label>
+                        <textarea class="form-control" id="edit_notes" name="notes" rows="2"></textarea>
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <label for="edit_status">Status</label>
+                        <select class="form-control" id="edit_status" name="status">
+                            <option value="Scheduled">Scheduled</option>
+                            <option value="Completed">Completed</option>
+                            <option value="Cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" form="editAppointmentForm" class="btn btn-primary">Update</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteAppointmentModal" tabindex="-1" aria-labelledby="deleteAppointmentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteAppointmentModalLabel">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this appointment?</p>
+                <p><strong>This action cannot be undone.</strong></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="deleteAppointmentForm" action="appointment_process.php" method="post">
+                    <input type="hidden" name="action" value="delete">
+                    <input type="hidden" name="appointmentID" id="delete_appointmentID">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
             </div>
         </div>
     </div>

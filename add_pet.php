@@ -55,7 +55,9 @@ include "includes/header.php";
                             <select class="form-control" id="ownerID" name="ownerID" required>
                                 <option value="">Select Owner</option>
                                 <?php
-                                $owners = mysqli_query($conn, "SELECT OwnerID, CONCAT(FirstName, ' ', LastName) as Name FROM owner ORDER BY Name");
+                                $stmt = $conn->prepare("CALL GetAllOwners()");
+                                $stmt->execute();
+                                $owners = $stmt->get_result();
                                 while ($owner = mysqli_fetch_assoc($owners)) {
                                     echo "<option value='" . $owner['OwnerID'] . "'>" . $owner['Name'] . "</option>";
                                 }

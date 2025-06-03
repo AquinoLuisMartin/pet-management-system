@@ -90,11 +90,16 @@ if (isset($_POST["submit"])) {
                         <label class="form-label">Owner:</label>
                         <select class="form-control" name="owner_id" required>
                             <?php
-                            $owners = mysqli_query($conn, "SELECT OwnerID, CONCAT(FirstName, ' ', LastName) as Name FROM owner ORDER BY Name");
+                            // Use stored procedure to get owners list
+                            $stmt = $conn->prepare("CALL GetAllOwners()");
+                            $stmt->execute();
+                            $owners = $stmt->get_result();
+                            
                             while($owner = mysqli_fetch_assoc($owners)) {
                                 $selected = ($owner['OwnerID'] == $pet['OwnerID']) ? 'selected' : '';
                                 echo "<option value='".$owner['OwnerID']."' $selected>".$owner['Name']."</option>";
                             }
+                            $stmt->close();
                             ?>
                         </select>
                     </div>

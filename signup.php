@@ -26,8 +26,12 @@ if(isset($_POST['signup'])) {
         $stmt = $conn->prepare("CALL CheckEmailExists(?, @email_exists)");
         $stmt->bind_param("s", $email);
         $stmt->execute();
-        $conn->query("SELECT @email_exists AS email_exists");
-        $result = $conn->query("SELECT @email_exists AS email_exists");
+        $stmt->execute();
+        $stmt->close();
+        
+        // Get the output parameter value
+        $select_result = $conn->query("SELECT @email_exists AS email_exists");
+        $result = $select_result;
         $row = $result->fetch_assoc();
 
         if ($row['email_exists']) {

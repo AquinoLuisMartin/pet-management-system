@@ -1,4 +1,5 @@
 <?php
+session_start();
 include "includes/db_conn.php";
 
 // Check if form was submitted
@@ -156,6 +157,126 @@ if (isset($_GET['action']) && $_GET['action'] == 'delete') {
         header("Location: appointment.php?error=Invalid appointment ID format");
         exit();
     }
+}
+
+// Handle GET request for fetching appointment data
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action']) && $_GET['action'] === 'get' && isset($_GET['id'])) {
+    $appointment_id = intval($_GET['id']);
+    
+    // Prepare and execute the query to get appointment details
+    $stmt = $conn->prepare("CALL GetAppointmentById(?)");
+    $stmt->bind_param("i", $appointment_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($row = $result->fetch_assoc()) {
+        // Return the appointment data as JSON
+        header('Content-Type: application/json');
+        echo json_encode($row);
+    } else {
+        // Return an error
+        http_response_code(404);
+        echo json_encode(['error' => 'Appointment not found']);
+    }
+    
+    $stmt->close();
+    $conn->close();
+    exit;
+}
+
+// Handle POST requests for create, update, delete
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
+    
+    // Create a new appointment
+    if ($_POST['action'] === 'create') {
+        $pet_id = intval($_POST['petID']);
+        $vet_id = intval($_POST['vetID']);
+        $date = $_POST['date'];
+        $time = $_POST['time'];
+        $reason = $_POST['reason'];
+        $notes = $_POST['notes'] ?? '';
+        $status = $_POST['status'];
+        
+        // Prepare and execute the create query
+        $stmt = $conn->prepare("CALL CreateAppointment(?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("iisssss", $pet_id, $vet_id, $date, $time, $reason, $notes, $status);
+        
+        if ($stmt->execute()) {
+            header("Location: appointment.php?success=Appointment created successfully");
+        } else {
+            header("Location: appointment.php?error=Failed to create appointment: " . $conn->error);
+        }
+        
+        $stmt->close();
+    }
+    
+    // Update an existing appointment
+    else if ($_POST['action'] === 'update' && isset($_POST['appointmentID'])) {
+        $appointment_id = intval($_POST['appointmentID']);
+        $pet_id = intval($_POST['petID']);
+        $vet_id = intval($_POST['vetID']);
+        $date = $_POST['date'];
+        $time = $_POST['time'];
+        $reason = $_POST['reason'];
+        $notes = $_POST['notes'] ?? '';
+        $status = $_POST['status'];
+        
+        // Prepare and execute the update query
+        $stmt = $conn->prepare("CALL UpdateAppointment(?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("iiisssss", $appointment_id, $pet_id, $vet_id, $date, $time, $reason, $notes, $status);
+        
+        if ($stmt->execute()) {
+            header("Location: appointment.php?success=Appointment updated successfully");
+        } else {
+            header("Location: appointment.php?error=Failed to update appointment: " . $conn->error);
+        }
+        
+        $stmt->close();
+    }
+    
+    // Delete an appointment
+    else if ($_POST['action'] === 'delete' && isset($_POST['appointmentID'])) {
+        $appointment_id = intval($_POST['appointmentID']);
+        
+        // Prepare and execute the delete query
+        $stmt = $conn->prepare("CALL DeleteAppointment(?)");
+        $stmt->bind_param("i", $appointment_id);
+        
+        if ($stmt->execute()) {
+            header("Location: appointment.php?success=Appointment deleted successfully");
+        } else {
+            header("Location: appointment.php?error=Failed to delete appointment: " . $conn->error);
+        }
+        
+        $stmt->close();
+    }
+    
+    $conn->close();
+    exit;
+}
+
+// Handle appointment status update
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['action'] == 'update_status') {
+    $petID = (int)$_POST['petID'];
+    $vetID = (int)$_POST['vetID'];
+    $date = $_POST['date'];
+    $time = $_POST['time'];
+    $status = $_POST['status'];
+    
+    // Call the UpdateAppointmentStatus stored procedure
+    $stmt = $conn->prepare("CALL UpdateAppointmentStatus(?, ?, ?, ?, ?)");
+    $stmt->bind_param("iisss", $petID, $vetID, $date, $time, $status);
+    
+    if ($stmt->execute()) {
+        // Redirect back to the referring page with success message
+        header("Location: " . $_SERVER['HTTP_REFERER'] . "&success=Status updated successfully");
+    } else {
+        // Redirect back with error message
+        header("Location: " . $_SERVER['HTTP_REFERER'] . "&error=Failed to update status: " . $conn->error);
+    }
+    
+    $stmt->close();
+    exit;
 }
 
 // Redirect back if no action was taken

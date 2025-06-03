@@ -91,17 +91,9 @@ if (isset($_SESSION['new_vet_id'])) {
                             </div>
                         </div>
                         <div class="card-footer bg-transparent d-flex justify-content-between">
-                            <a href="vet_schedule.php?id=' . $row['VetID'] . '" class="btn btn-sm btn-outline-info">
-                                <i class="fas fa-calendar"></i> Schedule
+                            <a href="check_appointment.php?vet_id=' . $row['VetID'] . '" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-clipboard-check"></i> Appointments
                             </a>
-                            <div>
-                                <button class="btn btn-sm btn-outline-primary edit-btn" data-id="' . $row['VetID'] . '">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="btn btn-sm btn-outline-danger delete-btn" data-id="' . $row['VetID'] . '">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
                         </div>
                     </div>
                 </div>';
@@ -168,25 +160,7 @@ if (isset($_SESSION['new_vet_id'])) {
     </div>
 </div>
 
-<script>
-$(document).ready(function() {
-    // Edit veterinarian
-    $(".edit-btn").on("click", function() {
-        var vetId = $(this).data("id");
-        // Implement AJAX to get vet details
-        $("#addVetModalLabel").text("Edit Veterinarian");
-        $("#addVetModal").modal("show");
-    });
-    
-    // Delete veterinarian
-    $(".delete-btn").on("click", function() {
-        var vetId = $(this).data("id");
-        if(confirm("Are you sure you want to delete this veterinarian record?")) {
-            // Implement deletion
-        }
-    });
-});
-</script>
+
 
 <?php include "includes/footer.php"; ?>
 

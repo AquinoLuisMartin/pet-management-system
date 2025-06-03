@@ -41,7 +41,7 @@ $stmt->close();
             <p class="text-muted">Manage payment records and billing</p>
         </div>
         <div class="col-auto">
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addPaymentModal">
+            <button type="button" id="newPaymentBtn" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPaymentModal">
                 <i class="fas fa-plus"></i> New Payment
             </button>
         </div>
@@ -128,19 +128,19 @@ $stmt->close();
         </div>
     </div>
 
-    <!-- Payment Table -->
-    <div class="card">
+    <!-- Payment Records Table -->
+    <div class="card mb-4">
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-hover">
+                <table class="table table-striped table-hover">
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Owner</th>
+                            <th>Invoice #</th>
                             <th>Pet</th>
+                            <th>Owner</th>
+                            <th>Date</th>
                             <th>Amount</th>
-                            <th>Payment Date</th>
-                            <th>Appointment Date</th>
                             <th>Method</th>
                             <th>Status</th>
                             <th>Actions</th>
@@ -148,39 +148,27 @@ $stmt->close();
                     </thead>
                     <tbody>
                         <?php
-                        if (mysqli_num_rows($result) > 0) {
-                            while ($row = mysqli_fetch_assoc($result)) {
-                                $status_class = '';
-                                switch ($row['Status']) {
-                                    case 'Paid':
-                                        $status_class = 'badge bg-success';
-                                        break;
-                                    case 'Pending':
-                                        $status_class = 'badge bg-warning';
-                                        break;
-                                    case 'Refunded':
-                                        $status_class = 'badge bg-info';
-                                        break;
-                                    case 'Failed':
-                                        $status_class = 'badge bg-danger';
-                                        break;
-                                }
-                                
-                                echo "<tr>
-                                    <td>" . $row['PaymentID'] . "</td>
-                                    <td>" . $row['OwnerName'] . "</td>
-                                    <td>" . $row['PetName'] . "</td>
-                                    <td>$" . number_format($row['Amount'], 2) . "</td>
-                                    <td>" . date('M d, Y', strtotime($row['PaymentDate'])) . "</td>
-                                    <td>" . date('M d, Y', strtotime($row['AppointmentDate'])) . "</td>
-                                    <td>" . $row['PaymentMethod'] . "</td>
-                                    <td><span class='" . $status_class . "'>" . $row['Status'] . "</span></td>
-                                    <td>
-                                        <button class='btn btn-sm btn-outline-primary edit-btn' data-id='" . $row['PaymentID'] . "'><i class='fas fa-edit'></i></button>
-                                        <button class='btn btn-sm btn-outline-danger delete-btn' data-id='" . $row['PaymentID'] . "'><i class='fas fa-trash'></i></button>
-                                        <button class='btn btn-sm btn-outline-info receipt-btn' data-id='" . $row['PaymentID'] . "'><i class='fas fa-file-invoice'></i></button>
-                                    </td>
-                                </tr>";
+                        if ($result->num_rows > 0) {
+                            while ($row = $result->fetch_assoc()) {
+                                echo "<tr>";
+                                echo "<td>{$row['PaymentID']}</td>";
+                                echo "<td>INV-" . str_pad($row['PaymentID'], 6, '0', STR_PAD_LEFT) . "</td>";
+                                echo "<td>{$row['PetName']}</td>";
+                                echo "<td>{$row['OwnerName']}</td>";
+                                echo "<td>" . date('M d, Y', strtotime($row['PaymentDate'])) . "</td>";
+                                echo "<td>$" . number_format($row['Amount'], 2) . "</td>";
+                                echo "<td>{$row['PaymentMethod']}</td>";
+                                echo "<td><span class='badge " . 
+                                      ($row['Status'] == 'Paid' ? 'bg-success' : 
+                                       ($row['Status'] == 'Pending' ? 'bg-warning' : 
+                                       ($row['Status'] == 'Refunded' ? 'bg-info' : 'bg-danger'))) . 
+                                      "'>{$row['Status']}</span></td>";
+                                echo "<td>
+                                        <button type='button' class='btn btn-sm btn-outline-primary receipt-btn' data-id='{$row['PaymentID']}' title='Generate Receipt'><i class='fas fa-file-invoice'></i></button>
+                                        <button type='button' class='btn btn-sm btn-outline-secondary edit-btn' data-id='{$row['PaymentID']}' title='Edit'><i class='fas fa-edit'></i></button>
+                                        <button type='button' class='btn btn-sm btn-outline-danger delete-btn' data-id='{$row['PaymentID']}' title='Delete'><i class='fas fa-trash'></i></button>
+                                      </td>";
+                                echo "</tr>";
                             }
                         } else {
                             echo "<tr><td colspan='9' class='text-center'>No payment records found</td></tr>";
@@ -191,159 +179,202 @@ $stmt->close();
             </div>
         </div>
     </div>
-</div>
 
-<!-- Add Payment Modal -->
-<div class="modal fade" id="addPaymentModal" tabindex="-1" role="dialog" aria-labelledby="addPaymentModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="addPaymentModalLabel">Add New Payment</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="paymentForm" action="payment_process.php" method="post">
-                    <div class="form-group">
-                        <label for="appointmentID">Appointment</label>
-                        <select class="form-control" id="appointmentID" name="appointmentID" required>
-                            <option value="">Select Appointment</option>
-                            <?php
-                            $appointments = mysqli_query($conn, "SELECT a.AppointmentID, a.Date, p.Name as PetName, 
-                                                             CONCAT(o.FirstName, ' ', o.LastName) as OwnerName
-                                                      FROM appointment a 
-                                                      JOIN pet p ON a.PetID = p.PetID
-                                                      JOIN owner o ON p.OwnerID = o.OwnerID
-                                                      WHERE a.Status = 'Completed'
-                                                      ORDER BY a.Date DESC");
-                            while ($apt = mysqli_fetch_assoc($appointments)) {
-                                echo "<option value='" . $apt['AppointmentID'] . "'>" . 
-                                      date('M d, Y', strtotime($apt['Date'])) . " - " . 
-                                      $apt['PetName'] . " (" . $apt['OwnerName'] . ")</option>";
-                            }
-                            ?>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="amount">Amount ($)</label>
-                        <input type="number" step="0.01" min="0" class="form-control" id="amount" name="amount" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="paymentDate">Payment Date</label>
-                        <input type="date" class="form-control" id="paymentDate" name="paymentDate" value="<?php echo date('Y-m-d'); ?>" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="paymentMethod">Payment Method</label>
-                        <select class="form-control" id="paymentMethod" name="paymentMethod" required>
-                            <option value="Cash">Cash</option>
-                            <option value="Credit Card">Credit Card</option>
-                            <option value="Debit Card">Debit Card</option>
-                            <option value="Insurance">Insurance</option>
-                            <option value="Mobile Payment">Mobile Payment</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="status">Status</label>
-                        <select class="form-control" id="status" name="status" required>
-                            <option value="Paid">Paid</option>
-                            <option value="Pending">Pending</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="notes">Notes</label>
-                        <textarea class="form-control" id="notes" name="notes" rows="2"></textarea>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="submit" form="paymentForm" class="btn btn-primary">Save</button>
+    <!-- Add Payment Modal -->
+    <div class="modal fade" id="addPaymentModal" tabindex="-1" aria-labelledby="addPaymentModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addPaymentModalLabel">Add New Payment</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Payment form fields -->
+                    <form id="paymentForm" action="payment_process.php" method="post">
+                        <input type="hidden" name="action" value="add">
+                        
+                        <div class="form-group mb-3">
+                            <select class="form-select" id="appointmentID" name="appointmentID" required>
+                                <option value="">-- Select a pet --</option>
+                                <?php
+                                // Fetch pets for dropdown
+                                $stmt = $conn->prepare("CALL GetPetsWithOwners()");
+                                $stmt->execute();
+                                $result = $stmt->get_result();
+                                
+                                while ($row = $result->fetch_assoc()) {
+                                    echo '<option value="' . $row['PetID'] . '">' . $row['PetName'] . ' - Owner: ' . $row['OwnerName'] . '</option>';
+                                }
+                                $stmt->close();
+                                $conn->next_result(); // Clear result set
+                                ?>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <input type="number" step="0.01" min="0" class="form-control" id="amount" name="amount" required>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <input type="date" class="form-control" id="paymentDate" required>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            
+                            <select class="form-select" id="paymentMethod" name="paymentMethod" required>
+                                <option value="">-- Select method --</option>
+                                <option value="Cash">Cash</option>
+                                <option value="Credit Card">Credit Card</option>
+                                <option value="Debit Card">Debit Card</option>
+                                <option value="Mobile Payment">Mobile Payment</option>
+                                <option value="Bank Transfer">Bank Transfer</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+
+                            <select class="form-select" id="status" name="status" required>
+                                <option value="">-- Select status --</option>
+                                <option value="Paid">Paid</option>
+                                <option value="Pending">Pending</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <textarea class="form-control" id="notes" name="notes" rows="3" placeholder="Additional Notes"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" form="paymentForm" class="btn btn-primary">Save</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<script>
-$(document).ready(function() {
-    // Search and filter functionality
-    $("#searchFilter").on("keyup", function() {
-        var value = $(this).val().toLowerCase();
-        $("table tbody tr").filter(function() {
-            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    <script>
+    $(document).ready(function() {
+        // Search and filter functionality
+        $("#searchFilter").on("keyup", function() {
+            var value = $(this).val().toLowerCase();
+            $("table tbody tr").filter(function() {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+        });
+        
+        // Method filter
+        $("#methodFilter").on("change", function() {
+            var value = $(this).val().toLowerCase();
+            if (value === "") {
+                $("table tbody tr").show();
+            } else {
+                $("table tbody tr").filter(function() {
+                    $(this).toggle($(this).find("td:nth-child(7)").text().toLowerCase().indexOf(value) > -1)
+                });
+            }
+        });
+        
+        // Status filter
+        $("#statusFilter").on("change", function() {
+            var value = $(this).val().toLowerCase();
+            if (value === "") {
+                $("table tbody tr").show();
+            } else {
+                $("table tbody tr").filter(function() {
+                    $(this).toggle($(this).find("td:nth-child(8)").text().toLowerCase().indexOf(value) > -1)
+                });
+            }
+        });
+        
+        // Date filter
+        $("#dateFilter").on("change", function() {
+            var value = $(this).val();
+            if (value === "") {
+                $("table tbody tr").show();
+            } else {
+                // Format the selected date for comparison
+                var selectedDate = new Date(value).toLocaleDateString('en-US', {
+                    month: 'short', 
+                    day: '2-digit',
+                    year: 'numeric'
+                });
+                
+                $("table tbody tr").filter(function() {
+                    var rowDate = $(this).find("td:nth-child(5)").text().trim();
+                    return $(this).toggle(rowDate === selectedDate);
+                });
+            }
+        });
+        
+        // Edit payment button click
+        $(".edit-btn").on("click", function() {
+            var paymentId = $(this).data("id");
+            $("#addPaymentModalLabel").text("Edit Payment");
+            
+            // Reset the form first
+            $("#paymentForm")[0].reset();
+            
+            // Add hidden payment ID field and change form action
+            if(!$("#payment_id").length) {
+                $("#paymentForm").append('<input type="hidden" id="payment_id" name="payment_id">');
+            }
+            $("#payment_id").val(paymentId);
+            $("#paymentForm input[name='action']").val("edit");
+            
+            // Fetch payment data via AJAX
+            $.ajax({
+                url: "payment_process.php",
+                type: "GET",
+                data: {
+                    action: "get_payment",
+                    id: paymentId
+                },
+                dataType: "json",
+                success: function(data) {
+                    if(data) {
+                        // Populate form fields with existing data
+                        $("#appointmentID").val(data.AppointmentID);
+                        $("#amount").val(data.Amount);
+                        $("#paymentDate").val(data.PaymentDate);
+                        $("#paymentMethod").val(data.PaymentMethod);
+                        $("#status").val(data.Status);
+                        $("#notes").val(data.Notes);
+                        
+                        var modal = new bootstrap.Modal(document.getElementById('addPaymentModal'));
+                        modal.show();
+                    } else {
+                        alert("Failed to load payment data.");
+                    }
+                },
+                error: function() {
+                    alert("An error occurred while fetching payment data.");
+                }
+            });
+        });
+        
+        // Delete payment button click
+        $(".delete-btn").on("click", function() {
+            var paymentId = $(this).data("id");
+            if(confirm("Are you sure you want to delete this payment record?")) {
+                // You can implement AJAX to delete the payment
+                // Example: window.location.href = "payment_process.php?action=delete&id=" + paymentId;
+            }
+        });
+        
+        // Generate receipt button click
+        $(".receipt-btn").on("click", function() {
+            var paymentId = $(this).data("id");
+            window.open("generate_receipt.php?id=" + paymentId, "_blank");
         });
     });
-    
-    // Method filter
-    $("#methodFilter").on("change", function() {
-        var value = $(this).val().toLowerCase();
-        if (value === "") {
-            $("table tbody tr").show();
-        } else {
-            $("table tbody tr").filter(function() {
-                $(this).toggle($(this).find("td:nth-child(7)").text().toLowerCase().indexOf(value) > -1)
-            });
-        }
-    });
-    
-    // Status filter
-    $("#statusFilter").on("change", function() {
-        var value = $(this).val().toLowerCase();
-        if (value === "") {
-            $("table tbody tr").show();
-        } else {
-            $("table tbody tr").filter(function() {
-                $(this).toggle($(this).find("td:nth-child(8)").text().toLowerCase().indexOf(value) > -1)
-            });
-        }
-    });
-    
-    // Date filter
-    $("#dateFilter").on("change", function() {
-        var value = $(this).val();
-        if (value === "") {
-            $("table tbody tr").show();
-        } else {
-            // Format the selected date for comparison
-            var selectedDate = new Date(value).toLocaleDateString('en-US', {
-                month: 'short', 
-                day: '2-digit',
-                year: 'numeric'
-            });
-            
-            $("table tbody tr").filter(function() {
-                var rowDate = $(this).find("td:nth-child(5)").text().trim();
-                return $(this).toggle(rowDate === selectedDate);
-            });
-        }
-    });
-    
-    // Edit payment button click
-    $(".edit-btn").on("click", function() {
-        var paymentId = $(this).data("id");
-        // You can implement AJAX to get payment details and populate the form
-        $("#addPaymentModalLabel").text("Edit Payment");
-        $("#addPaymentModal").modal("show");
-    });
-    
-    // Delete payment button click
-    $(".delete-btn").on("click", function() {
-        var paymentId = $(this).data("id");
-        if(confirm("Are you sure you want to delete this payment record?")) {
-            // You can implement AJAX to delete the payment
-            // Example: window.location.href = "payment_process.php?action=delete&id=" + paymentId;
-        }
-    });
-    
-    // Generate receipt button click
-    $(".receipt-btn").on("click", function() {
-        var paymentId = $(this).data("id");
-        window.open("generate_receipt.php?id=" + paymentId, "_blank");
+    </script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Make sure "New Payment" button works correctly
+    document.getElementById('newPaymentBtn')?.addEventListener('click', function() {
+        document.getElementById('addPaymentModalLabel').textContent = 'Add New Payment';
     });
 });
 </script>
