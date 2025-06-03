@@ -82,7 +82,7 @@ $result = $stmt->get_result();
                                     <td>
                                         <a href='owner_view.php?id=" . $row['OwnerID'] . "' class='btn btn-sm btn-outline-info'><i class='fas fa-eye'></i></a>
                                         <a href='owner_update.php?id=" . $row['OwnerID'] . "' class='btn btn-sm btn-outline-primary'><i class='fas fa-edit'></i></a>
-                                        <a href='owner_delete.php?action=delete&id=" . $row['OwnerID'] . "' class='btn btn-sm btn-outline-danger delete-btn' onclick='return confirm(\"Are you sure you want to delete this owner?\")'><i class='fas fa-trash'></i></a>
+                                        <a href='owner_delete.php?id=" . $row['OwnerID'] . "' class='btn btn-sm btn-outline-danger delete-btn' onclick='return confirm(\"Are you sure you want to delete this owner?\")'><i class='fas fa-trash'></i></a>
                                     </td>
                                 </tr>";
                             }
