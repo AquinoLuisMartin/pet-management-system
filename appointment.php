@@ -255,17 +255,17 @@ if ($owner_id) {
                     </div>
                     
                     <div class="form-group mb-3">
-                        <label for="reason" class="form-label">Reason</label>
+                        
                         <textarea class="form-control" id="reason" name="reason" rows="3" required></textarea>
                     </div>
                     
                     <div class="form-group mb-3">
-                        <label for="notes" class="form-label">Additional Notes</label>
+                        
                         <textarea class="form-control" id="notes" name="notes" rows="2"></textarea>
                     </div>
                     
                     <div class="form-group mb-3">
-                        <label for="status" class="form-label">Status</label>
+                        
                         <select class="form-control" id="status" name="status">
                             <option value="Scheduled">Scheduled</option>
                             <option value="Completed">Completed</option>

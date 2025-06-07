@@ -55,7 +55,7 @@ $stmt->close();
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <h6 class="card-title">Total Revenue</h6>
-                            <h2 class="mb-0">$<?php echo number_format($total_revenue, 2); ?></h2>
+                            <h2 class="mb-0">₱<?php echo number_format($total_revenue, 2); ?></h2>
                         </div>
                         <i class="fas fa-chart-line fa-2x"></i>
                     </div>
@@ -68,7 +68,7 @@ $stmt->close();
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <h6 class="card-title">Pending Payments</h6>
-                            <h2 class="mb-0">$<?php echo number_format($pending_revenue, 2); ?></h2>
+                            <h2 class="mb-0">₱<?php echo number_format($pending_revenue, 2); ?></h2>
                         </div>
                         <i class="fas fa-clock fa-2x"></i>
                     </div>
@@ -81,7 +81,7 @@ $stmt->close();
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <h6 class="card-title">Today's Payments</h6>
-                            <h2 class="mb-0">$<?php echo number_format($today_total, 2); ?></h2>
+                            <h2 class="mb-0">₱<?php echo number_format($today_total, 2); ?></h2>
                             <small><?php echo $today_count; ?> payments today</small>
                         </div>
                         <i class="fas fa-calendar-day fa-2x"></i>
@@ -156,7 +156,7 @@ $stmt->close();
                                 echo "<td>{$row['PetName']}</td>";
                                 echo "<td>{$row['OwnerName']}</td>";
                                 echo "<td>" . date('M d, Y', strtotime($row['PaymentDate'])) . "</td>";
-                                echo "<td>$" . number_format($row['Amount'], 2) . "</td>";
+                                echo "<td>₱" . number_format($row['Amount'], 2) . "</td>";
                                 echo "<td>{$row['PaymentMethod']}</td>";
                                 echo "<td><span class='badge " . 
                                       ($row['Status'] == 'Paid' ? 'bg-success' : 
