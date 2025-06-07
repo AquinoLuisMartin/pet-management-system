@@ -157,7 +157,13 @@ if ($owner_id) {
                                     <td><span class='" . $status_class . "'>" . $row['Status'] . "</span></td>
                                     <td>
                                         <button class='btn btn-sm btn-outline-primary edit-btn' data-id='" . $row['AppointmentID'] . "'><i class='fas fa-edit'></i></button>
-                                        <button class='btn btn-sm btn-outline-danger delete-btn' data-id='" . $row['AppointmentID'] . "'><i class='fas fa-trash'></i></button>
+                                        <form action='delete_appointment.php' method='post' style='display:inline;'>
+                                            <input type='hidden' name='action' value='delete'>
+                                            <input type='hidden' name='appointment_id' value='" . $row['AppointmentID'] . "'>
+                                            <button type='submit' class='btn btn-danger btn-sm'>
+                                                <i class='fas fa-trash'></i>
+                                            </button>
+                                        </form>
                                     </td>
                                 </tr>";
                             }
@@ -447,6 +453,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 $(this).toggle($(this).find("td:nth-child(4)").text() === value)
             });
         }
+    });
+});
+</script>
+
+<script>
+$(document).ready(function() {
+    $(".delete-btn").on("click", function() {
+        var appointmentId = $(this).data("id");
+        $("#delete_appointmentID").val(appointmentId);
+        $("#deleteAppointmentModal").modal("show");
     });
 });
 </script>
